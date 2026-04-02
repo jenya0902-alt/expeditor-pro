@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-title" content="Expeditor">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2991/2991231.png">
 
-    <title>Expeditor Elite v17.4</title>
+    <title>Expeditor Elite v17.5</title>
     <style>
         :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --danger: #FF453A; --success: #32D74B; --waze: #33CCFF; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
@@ -22,21 +22,19 @@
             position: sticky; top: 0; z-index: 2000; text-transform: uppercase; letter-spacing: 1px;
         }
         .alert-active { background: var(--danger) !important; color: white !important; animation: blink 0.6s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
         header { padding: 15px 20px; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 50px; z-index: 1000; }
         .logo-text { font-weight: 900; font-size: 1.3rem; color: white; }
-        .sos-btn { background: rgba(255, 69, 58, 0.2); color: var(--danger); padding: 8px 15px; border-radius: 10px; font-weight: 800; border: 1px solid var(--danger); font-size: 0.7rem; text-decoration: none; }
         
+        /* КНОПКА ОБЩЕГО МАРШРУТА */
+        .route-all-btn { background: #34C759; color: #000; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 0.7rem; text-decoration: none; border: none; box-shadow: 0 4px 10px rgba(52, 199, 89, 0.3); }
+
         .tabs { display: flex; background: #1C1C1E; margin: 15px; border-radius: 14px; padding: 3px; border: 0.5px solid var(--border); }
         .tab-btn { flex: 1; border: none; background: none; padding: 12px; color: var(--gray); font-weight: 600; border-radius: 11px; font-size: 0.7rem; }
         .tab-btn.active { background: #3A3A3C; color: white; }
 
         .container { padding: 0 15px; }
         .card { background: #1C1C1E; border-radius: 24px; margin-bottom: 15px; padding: 20px; border: 0.5px solid var(--border); position: relative; }
-        
-        .help-title { color: var(--primary); font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-        .help-text { color: #D1D1D6; font-size: 0.9rem; line-height: 1.4; }
         
         .move-controls { display: flex; gap: 8px; margin-bottom: 12px; }
         .move-btn { background: #2C2C2E; border: 1px solid var(--border); color: white; width: 45px; height: 38px; border-radius: 10px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
@@ -48,23 +46,23 @@
         .b-call { background: #2C2C2E; grid-column: span 2; border: 0.5px solid var(--border); }
         .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 10px; }
 
-        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px 20px 40px; border-radius: 30px 30px 0 0; z-index: 3000; border-top: 1px solid var(--border); max-height: 90vh; overflow-y: auto; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); }
+        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px 20px 40px; border-radius: 30px 30px 0 0; z-index: 3000; border-top: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
         input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; }
         .city-chip { background: #2C2C2E; border: 1px solid var(--border); color: var(--gray); padding: 10px 15px; border-radius: 12px; font-size: 0.75rem; margin-right: 5px; border: none; }
         .city-chip.active { background: var(--primary); color: white; }
 
-        .fab { position: fixed; bottom: 35px; right: 25px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: none; z-index: 1500; box-shadow: 0 10px 20px rgba(10, 132, 255, 0.4); }
+        .fab { position: fixed; bottom: 35px; right: 25px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: none; z-index: 1500; }
         .hebrew { direction: rtl; text-align: right; }
     </style>
 </head>
 <body onclick="initAudio()">
 
-<div id="alert-status">СИСТЕМА ГОТОВА...</div>
+<div id="alert-status">СИСТЕМА АКТИВНА...</div>
 
 <header>
-    <a href="https://www.google.com/maps/search/shelter/@31.6688,34.5743,14z" class="sos-btn" target="_blank">🛡️ КАРТА SOS</a>
+    <button class="route-all-btn" onclick="openFullRoute()">🗺️ ВЕСЬ МАРШРУТ</button>
     <div class="logo-text">Expeditor</div>
-    <div style="width:60px"></div>
+    <a href="https://www.google.com/maps/dir//Ashkelon,+Israel/data=!4m9!4m8!1m0!1m5!1m1!19sChIJc15oQVGcAhURD9ySMB0hcus!2m2!1d34.5742523!2d31.668788499999998!3e0" class="sos-btn" style="padding: 8px 10px;" target="_blank">🛡️ SOS</a>
 </header>
 
 <div class="tabs">
@@ -83,7 +81,7 @@
     <h3 style="text-align:center; margin-top:0;">Добавить в план</h3>
     <div style="display:flex; gap:5px; overflow-x:auto; margin-bottom:15px;" id="order-city-selector"></div>
     <select id="f-select" size="6" style="height: auto;"></select>
-    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="addTask()">ДОБАВИТЬ В МАРШРУТ</button>
+    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="addTask()">ДОБАВИТЬ</button>
     <button class="btn-n" style="width:100%; background:none; margin:10px 0; color:var(--gray)" onclick="closeModal()">ЗАКРЫТЬ</button>
 </div>
 
@@ -94,15 +92,15 @@
     <input type="text" id="f-name" placeholder="Название магазина">
     <input type="tel" id="f-phone" placeholder="Телефон">
     <input type="text" id="f-addr" class="hebrew" placeholder="Адрес (иврит)">
-    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="saveClient()">СОХРАНИТЬ В БАЗУ</button>
+    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="saveClient()">СОХРАНИТЬ</button>
     <button class="btn-n" style="width:100%; background:none; margin:10px 0; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <script>
     let activeTab = 'tasks', filterCity = 'Все', modalCity = 'Ашкелон', audioCtx = null;
-    let clients = JSON.parse(localStorage.getItem('cl_v174')) || [];
-    let tasks = JSON.parse(localStorage.getItem('tk_v174')) || [];
-    let archive = JSON.parse(localStorage.getItem('ar_v174')) || [];
+    let clients = JSON.parse(localStorage.getItem('cl_v175')) || [];
+    let tasks = JSON.parse(localStorage.getItem('tk_v175')) || [];
+    let archive = JSON.parse(localStorage.getItem('ar_v175')) || [];
     const citiesList = ['Ашкелон', 'Ашдод', 'Кирьят-Гат', 'Другой'];
 
     async function checkAlerts() {
@@ -131,11 +129,24 @@
         render(); 
     }
 
+    // ФУНКЦИЯ ПОСТРОЕНИЯ ОБЩЕГО МАРШРУТА
+    function openFullRoute() {
+        let list = tasks.filter(t => filterCity === 'Все' || t.city === filterCity);
+        if (list.length === 0) return alert("Добавь точки в маршрут!");
+        
+        let baseUrl = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(list[list.length-1].a + " " + list[list.length-1].city);
+        if (list.length > 1) {
+            let waypoints = list.slice(0, -1).map(t => encodeURIComponent(t.a + " " + t.city)).join('|');
+            baseUrl += "&waypoints=" + waypoints;
+        }
+        window.open(baseUrl, '_blank');
+    }
+
     function moveTask(index, dir) {
         let newIdx = index + dir;
         if (newIdx >= 0 && newIdx < tasks.length) {
             [tasks[index], tasks[newIdx]] = [tasks[newIdx], tasks[index]];
-            localStorage.setItem('tk_v174', JSON.stringify(tasks));
+            localStorage.setItem('tk_v175', JSON.stringify(tasks));
             render();
         }
     }
@@ -162,7 +173,7 @@
                     <div class="nav-grid">
                         <a href="tel:${t.ph}" class="btn-n b-call">📞 ПОЗВОНИТЬ</a>
                         <a href="waze://?q=${encodeURIComponent(t.a+' '+t.city)}&navigate=yes" class="btn-n b-waze">WAZE</a>
-                        <a href="https://www.google.com/maps/search/${encodeURIComponent(t.a+' '+t.city)}" target="_blank" class="btn-n b-go">GOOGLE</a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t.a+' '+t.city)}" target="_blank" class="btn-n b-go">GOOGLE</a>
                         <button class="btn-n b-done" onclick="done(${t.id})">✅ ГОТОВО</button>
                     </div>
                 </div>`).join('');
@@ -174,29 +185,14 @@
             cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.5;"><b>${a.n}</b><br>${a.a}</div>`).join('');
         } else if (activeTab === 'help') {
             cont.innerHTML = `
-                <div class="card"><div class="help-title">🏙️ Города</div><div class="help-text">Жми кнопки сверху, чтобы отфильтровать магазины по нужному городу.</div></div>
-                <div class="card"><div class="help-title">↕️ Очередь</div><div class="help-text">Стрелки ↑↓ меняют порядок магазинов в твоем списке.</div></div>
-                <div class="card"><div class="help-title">🗺️ Навигатор</div><div class="help-text">Waze — основной. Google — если Waze не находит точный адрес.</div></div>
-                <div class="card"><div class="help-title">📞 Звонок</div><div class="help-text">Кнопка звонка сразу набирает номер клиента.</div></div>
-                <div class="card"><div class="help-title">✅ Готово</div><div class="help-text">Нажми, когда сдала товар. Магазин уйдет в архив.</div></div>
-                <div class="card"><div class="help-title">🚨 Тревога</div><div class="help-text">Если верхняя полоса покраснела — ищи укрытие. Карта SOS покажет ближайшие.</div></div>`;
+                <div class="card"><div class="help-title">🗺️ Весь маршрут</div><div class="help-text">Кнопка вверху строит маршрут сразу через все магазины из твоего списка в Google Maps.</div></div>
+                <div class="card"><div class="help-title">🏙️ Фильтры</div><div class="help-text">Выбери город, и кнопка "Весь маршрут" построит путь только по магазинам этого города.</div></div>
+                <div class="card"><div class="help-title">↕️ Порядок</div><div class="help-text">Сначала выстрой магазины стрелками ↑↓ в нужном порядке, а потом жми "Весь маршрут".</div></div>`;
         }
     }
 
     function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-    
-    function clickPlus() { 
-        if(activeTab==='clients') { 
-            document.getElementById('f-idx').value="-1"; 
-            document.getElementById('f-name').value="";
-            document.getElementById('f-phone').value="";
-            document.getElementById('f-addr').value="";
-            document.getElementById('win-client').style.display='block'; 
-        } else { 
-            updateOrderModalCities(); 
-            document.getElementById('win-order').style.display='block'; 
-        } 
-    }
+    function clickPlus() { if(activeTab==='clients') { document.getElementById('f-idx').value="-1"; document.getElementById('win-client').style.display='block'; } else { updateOrderModalCities(); document.getElementById('win-order').style.display='block'; } }
     
     function updateOrderModalCities() {
         const selector = document.getElementById('order-city-selector');
@@ -210,9 +206,7 @@
         const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, ph = document.getElementById('f-phone').value, city = document.getElementById('f-city').value, idx = parseInt(document.getElementById('f-idx').value);
         if (!n || !a) return;
         if (idx > -1) clients[idx] = {name:n, addr:a, phone:ph, city:city}; else clients.push({name:n, addr:a, phone:ph, city:city});
-        localStorage.setItem('cl_v174', JSON.stringify(clients)); 
-        closeModal(); // САМО ЗАКРЫВАЕТСЯ
-        render();
+        localStorage.setItem('cl_v175', JSON.stringify(clients)); closeModal(); render();
     }
 
     function addTask() {
@@ -220,13 +214,11 @@
         if (val==="") return;
         const c = clients[val];
         tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone});
-        localStorage.setItem('tk_v174', JSON.stringify(tasks)); 
-        closeModal(); // САМО ЗАКРЫВАЕТСЯ
-        render();
+        localStorage.setItem('tk_v175', JSON.stringify(tasks)); closeModal(); render();
     }
 
-    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v174', JSON.stringify(tasks)); render(); }
-    function done(id) { let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); localStorage.setItem('tk_v174', JSON.stringify(tasks)); localStorage.setItem('ar_v174', JSON.stringify(archive)); render(); }
+    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v175', JSON.stringify(tasks)); render(); }
+    function done(id) { let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); localStorage.setItem('tk_v175', JSON.stringify(tasks)); localStorage.setItem('ar_v175', JSON.stringify(archive)); render(); }
     function editClient(i) { const c = clients[i]; document.getElementById('f-idx').value = i; document.getElementById('f-name').value = c.name; document.getElementById('f-phone').value = c.phone; document.getElementById('f-addr').value = c.addr; document.getElementById('f-city').value = c.city; document.getElementById('win-client').style.display = 'block'; }
 
     render();
