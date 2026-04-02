@@ -3,125 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Expeditor Elite v16.1 | SECURE</title>
+    <title>Expeditor Elite v16.2</title>
     <style>
         :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --danger: #FF453A; --success: #32D74B; --waze: #33CCFF; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: 100px; transition: background 0.5s; overflow-x: hidden; }
         
         /* МОНИТОРИНГ ТРЕВОГИ */
-        #alert-status { background: #1C1C1E; padding: 12px; text-align: center; font-size: 0.75rem; font-weight: 800; border-bottom: 0.5px solid var(--border); color: var(--success); position: sticky; top: 0; z-index: 1100; transition: 0.3s; }
+        #alert-status { background: #151515; padding: 8px; text-align: center; font-size: 0.7rem; font-weight: 700; border-bottom: 0.5px solid var(--border); color: var(--success); position: sticky; top: 0; z-index: 1100; text-transform: uppercase; letter-spacing: 1px; }
         .alert-active { background: var(--danger) !important; color: white !important; animation: blink 0.6s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-        header { padding: 15px 20px; background: rgba(21, 21, 21, 0.95); backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 41px; z-index: 1000; }
-        .sos-btn { background: var(--danger); color: white; padding: 8px 14px; border-radius: 10px; font-weight: 800; border: none; font-size: 0.7rem; }
+        /* КРАСИВЫЙ ХЕДЕР */
+        header { 
+            padding: 25px 20px 15px; 
+            background: rgba(0, 0, 0, 0.85); 
+            backdrop-filter: blur(25px); 
+            border-bottom: 0.5px solid var(--border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 36px; 
+            z-index: 1000; 
+        }
         
-        .tabs { display: flex; background: #1C1C1E; margin: 15px; border-radius: 14px; padding: 3px; border: 0.5px solid var(--border); }
-        .tab-btn { flex: 1; border: none; background: none; padding: 10px; color: var(--gray); font-weight: 600; border-radius: 11px; font-size: 0.65rem; }
-        .tab-btn.active { background: #3A3A3C; color: white; }
+        .logo-text {
+            font-weight: 900;
+            font-size: 1.3rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(180deg, #FFFFFF 0%, #A2A2A2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(10, 132, 255, 0.3);
+        }
+        
+        .version-badge {
+            font-size: 0.6rem;
+            color: var(--primary);
+            vertical-align: super;
+            margin-left: 4px;
+            font-weight: 400;
+            letter-spacing: 0;
+        }
 
-        .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding: 0 15px 15px; scrollbar-width: none; min-height: 40px; }
+        .sos-btn { 
+            background: rgba(255, 69, 58, 0.15); 
+            color: var(--danger); 
+            padding: 8px 12px; 
+            border-radius: 10px; 
+            font-weight: 700; 
+            border: 1px solid rgba(255, 69, 58, 0.3); 
+            font-size: 0.65rem; 
+            transition: 0.2s;
+        }
+        .sos-btn:active { background: var(--danger); color: white; }
+        
+        .tabs { display: flex; background: #1C1C1E; margin: 20px 15px; border-radius: 14px; padding: 3px; border: 0.5px solid var(--border); }
+        .tab-btn { flex: 1; border: none; background: none; padding: 10px; color: var(--gray); font-weight: 600; border-radius: 11px; font-size: 0.65rem; transition: 0.3s; }
+        .tab-btn.active { background: #3A3A3C; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+
+        .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding: 0 15px 15px; scrollbar-width: none; }
         .f-chip { background: #1C1C1E; color: var(--gray); padding: 8px 15px; border-radius: 15px; font-size: 0.7rem; border: 0.5px solid var(--border); white-space: nowrap; }
-        .f-chip.active { background: var(--primary); color: white; }
+        .f-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
 
         .container { padding: 0 15px; }
-        .card { background: linear-gradient(145deg, #1c1c1e 0%, #161618 100%); border-radius: 20px; margin-bottom: 15px; padding: 18px; border: 0.5px solid var(--border); }
-        .multi-route-btn { width: 100%; background: linear-gradient(135deg, #34C759 0%, #248A3D 100%); color: white; padding: 16px; border-radius: 15px; border: none; font-weight: 800; margin-bottom: 15px; font-size: 0.8rem; box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3); }
+        .card { background: linear-gradient(145deg, #1c1c1e 0%, #161618 100%); border-radius: 24px; margin-bottom: 15px; padding: 20px; border: 0.5px solid var(--border); }
+        .multi-route-btn { width: 100%; background: linear-gradient(135deg, #34C759 0%, #248A3D 100%); color: white; padding: 18px; border-radius: 18px; border: none; font-weight: 800; margin-bottom: 20px; font-size: 0.85rem; box-shadow: 0 8px 20px rgba(52, 199, 89, 0.2); }
 
-        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-        .btn-n { border-radius: 12px; padding: 12px; text-align: center; text-decoration: none; font-size: 0.7rem; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; border: none; }
+        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-n { border-radius: 14px; padding: 14px; text-align: center; text-decoration: none; font-size: 0.75rem; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; border: none; }
         .b-waze { background: var(--waze); color: #000; }
         .b-go { background: var(--primary); }
-        .b-call { background: #2C2C2E; grid-column: span 2; border: 0.5px solid var(--border); margin-bottom: 4px; }
-        .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 10px; padding: 16px; }
+        .b-call { background: #2C2C2E; grid-column: span 2; border: 0.5px solid var(--border); margin-bottom: 5px; }
+        .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 12px; padding: 18px; font-size: 0.85rem; }
 
-        .help-card { background: #1C1C1E; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 10px; border-radius: 10px; font-size: 0.85rem; line-height: 1.4; }
-        .sos-card { background: linear-gradient(135deg, #FF453A 0%, #8E0000 100%); border: none; }
-        .sos-card b { color: white !important; }
+        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 35px 25px 60px; border-radius: 30px 30px 0 0; z-index: 2000; border-top: 0.5px solid var(--border); box-shadow: 0 -15px 50px rgba(0,0,0,0.9); }
+        input, select { width: 100%; padding: 18px; margin-bottom: 15px; border-radius: 15px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; outline: none; }
+        .hebrew { direction: rtl; text-align: right; font-size: 1.1rem; }
 
-        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 30px 20px 50px; border-radius: 25px 25px 0 0; z-index: 2000; border-top: 0.5px solid var(--border); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
-        input, select { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; outline: none; }
-        .hebrew { direction: rtl; text-align: right; border-color: var(--primary); }
-
-        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; border: none; z-index: 1500; box-shadow: 0 5px 15px rgba(10, 132, 255, 0.4); }
-        footer { text-align: center; color: #38383A; font-size: 0.55rem; margin: 30px 0; letter-spacing: 1.5px; }
+        .fab { position: fixed; bottom: 35px; right: 25px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: none; z-index: 1500; box-shadow: 0 10px 25px rgba(10, 132, 255, 0.4); }
+        footer { text-align: center; color: #3A3A3C; font-size: 0.6rem; margin: 40px 0; letter-spacing: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body onclick="initAudio()">
 
-<div id="alert-status"><span>●</span> НЕБО ЧИСТОЕ (МОНИТОРИНГ)</div>
+<div id="alert-status"><span>●</span> Sky is Clear</div>
 
 <header>
-    <button class="sos-btn" onclick="window.open('https://www.google.com/maps/search/bomb+shelter8', '_blank')">🛡️ УБЕЖИЩЕ</button>
-    <div style="font-weight: 900; font-size: 1rem; color: var(--primary);">Expeditor Elite</div>
-    <div style="width:36px"></div>
+    <button class="sos-btn" onclick="window.open('https://www.google.com/maps/dir/$9', '_blank')">🛡️ SOS</button>
+    <div class="logo-text">Expeditor<span class="version-badge">v16.2</span></div>
+    <div style="width:55px"></div>
 </header>
 
 <div class="tabs">
     <button id="t-tasks" class="tab-btn active" onclick="setTab('tasks')">МАРШРУТ</button>
     <button id="t-clients" class="tab-btn" onclick="setTab('clients')">БАЗА</button>
     <button id="t-archive" class="tab-btn" onclick="setTab('archive')">АРХИВ</button>
-    <button id="t-help" class="tab-btn" onclick="setTab('help')">📖 ПОМОЩЬ</button>
+    <button id="t-help" class="tab-btn" onclick="setTab('help')">📖 ИНФО</button>
 </div>
 
 <div id="filter-area" class="filter-bar"></div>
 <div id="main-content" class="container"></div>
 
 <button id="fab-plus" class="fab" onclick="clickPlus()">+</button>
-<footer>Jenya Ochakovski • v16.1</footer>
+<footer>Jenya Ochakovski • Elite Systems</footer>
 
 <div id="win-client" class="modal">
-    <h3 style="text-align:center; margin-top:0;">Карточка клиента</h3>
+    <h3 style="text-align:center; margin-top:0; font-weight:800;">Карточка клиента</h3>
     <input type="hidden" id="f-idx" value="-1">
     <select id="f-city"><option>Ашкелон</option><option>Ашдод</option><option>Кирьят-Гат</option><option>Другой</option></select>
     <input type="text" id="f-name" placeholder="Имя / Магазин">
     <input type="tel" id="f-phone" placeholder="Телефон">
     <input type="text" id="f-addr" class="hebrew" placeholder="Адрес (иврит)">
-    <button class="btn-n b-go" style="width:100%; padding:18px;" onclick="saveClient()">СОХРАНИТЬ</button>
+    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="saveClient()">СОХРАНИТЬ КЛИЕНТА</button>
     <button class="btn-n" style="width:100%; background:none; margin-top:10px; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <div id="win-order" class="modal">
-    <h3 style="text-align:center; margin-top:0;">Добавить в маршрут</h3>
-    <select id="f-select"></select>
-    <button class="btn-n b-go" style="width:100%; padding:18px;" onclick="addTask()">ДОБАВИТЬ В СПИСОК</button>
+    <h3 style="text-align:center; margin-top:0; font-weight:800;">Куда едем сегодня?</h3>
+    <select id="f-select" style="padding:20px;"></select>
+    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="addTask()">ДОБАВИТЬ В МАРШРУТ</button>
     <button class="btn-n" style="width:100%; background:none; margin-top:10px; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <script>
     let activeTab = 'tasks', filterCity = 'Все', audioCtx = null;
-    let clients = JSON.parse(localStorage.getItem('cl_v161')) || [];
-    let tasks = JSON.parse(localStorage.getItem('tk_v161')) || [];
-    let archive = JSON.parse(localStorage.getItem('ar_v161')) || [];
+    let clients = JSON.parse(localStorage.getItem('cl_v162')) || [];
+    let tasks = JSON.parse(localStorage.getItem('tk_v162')) || [];
+    let archive = JSON.parse(localStorage.getItem('ar_v162')) || [];
 
-    // --- МОНИТОРИНГ ЦЕВА АДОМ ---
+    // ALERT SYSTEM
     async function checkAlerts() {
         const status = document.getElementById('alert-status');
-        const myCities = ["אשקלון", "אשדוד", "קרית גת"]; // Ищем эти города
-
+        const myCities = ["אשקלון", "אשדוד", "קרית גת"];
         try {
             const res = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.oref.org.il/WarningMessages/History/AlertsHistory.json'));
             const data = await res.json();
             const alerts = JSON.parse(data.contents);
-            
-            // Проверяем последние уведомления (обычно API отдает за последние часы)
             const danger = alerts.find(a => myCities.includes(a.data));
-
             if (danger) {
-                status.innerHTML = `🚨 ЦЕВА АДОМ: ${danger.data}!`;
+                status.innerHTML = `🚨 RED ALERT: ${danger.data}!`;
                 status.classList.add('alert-active');
-                document.body.style.background = "#440000";
+                document.body.style.background = "#300";
                 playSiren();
             } else {
-                status.innerHTML = "<span>●</span> НЕБО ЧИСТОЕ (МОНИТОРИНГ)";
+                status.innerHTML = "<span>●</span> Sky is Clear";
                 status.classList.remove('alert-active');
                 document.body.style.background = "var(--bg)";
             }
-        } catch (e) {
-            status.innerHTML = "⚠️ ПРОВЕРЬТЕ ИНТЕРНЕТ";
-            status.style.color = "var(--gray)";
-        }
+        } catch (e) { status.innerHTML = "⚠️ Monitoring Offline"; }
     }
 
     function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
@@ -130,13 +161,13 @@
         let o = audioCtx.createOscillator(), g = audioCtx.createGain();
         o.type = 'sawtooth'; o.frequency.setValueAtTime(440, audioCtx.currentTime);
         o.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.5);
-        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        g.gain.setValueAtTime(0.15, audioCtx.currentTime);
         o.connect(g); g.connect(audioCtx.destination);
-        o.start(); o.stop(audioCtx.currentTime + 0.5);
+        o.start(); o.stop(audioCtx.currentTime + 0.6);
     }
-    setInterval(checkAlerts, 4000); // Проверка каждые 4 секунды
+    setInterval(checkAlerts, 4000);
 
-    // --- ЛОГИКА ПРИЛОЖЕНИЯ ---
+    // APP LOGIC
     const closeModal = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
     const openModal = (id) => { closeModal(); document.getElementById(id).style.display = 'block'; };
 
@@ -154,37 +185,34 @@
         if (activeTab === 'tasks') {
             const cities = ['Все', 'Ашкелон', 'Ашдод', 'Кирьят-Гат', 'Другой'];
             filt.innerHTML = cities.map(c => `<button class="f-chip ${filterCity === c ? 'active' : ''}" onclick="filterCity='${c}'; render();">${c}</button>`).join('');
-            
             let list = filterCity === 'Все' ? tasks : tasks.filter(t => t.city === filterCity);
+            
             if (list.length > 0) {
-                const b = document.createElement('button'); b.className = 'multi-route-btn'; b.innerText = `🗺️ ВЕСЬ МАРШРУТ ОТ МЕНЯ (${list.length})`;
-                b.onclick = () => window.open(`https://www.google.com/maps/search/bomb+shelter9` + list.map(t => encodeURIComponent(t.a + " " + t.city)).join('/'), '_blank');
+                const b = document.createElement('button'); b.className = 'multi-route-btn'; b.innerText = `🗺️ ПОСТРОИТЬ ВЕСЬ МАРШРУТ (${list.length})`;
+                b.onclick = () => window.open(`https://www.google.com/maps/search/?api=1&query=$0` + list.map(t => encodeURIComponent(t.a + " " + t.city)).join('/'), '_blank');
                 cont.appendChild(b);
             }
-
             cont.innerHTML += list.map(t => `<div class="card">
-                <div style="display:flex; justify-content:space-between;"><b>${t.n}</b><button onclick="delTask(${t.id})" style="color:var(--danger); background:none; border:none; font-size:1.2rem;">✕</button></div>
-                <div class="hebrew" style="color:var(--gray); margin:12px 0; font-size:1.1rem;">${t.a} (${t.city})</div>
+                <div style="display:flex; justify-content:space-between; align-items:center;"><b>${t.n}</b><button onclick="delTask(${t.id})" style="color:var(--gray); background:none; border:none; font-size:1.5rem;">×</button></div>
+                <div class="hebrew" style="color:var(--gray); margin:15px 0; font-size:1.1rem; line-height:1.4;">${t.a}<br><span style="font-size:0.8rem; color:var(--primary)">${t.city}</span></div>
                 <div class="nav-grid">
                     <a href="tel:${t.ph}" class="btn-n b-call">📞 ПОЗВОНИТЬ</a>
                     <a href="waze://?q=${encodeURIComponent(t.a+' '+t.city)}&navigate=yes" class="btn-n b-waze">WAZE</a>
-                    <a href="https://www.google.com/maps/dir/Current+Location/${encodeURIComponent(t.a+' '+t.city)}" target="_blank" class="btn-n b-go">GOOGLE</a>
-                    <button class="btn-n b-done" onclick="done(${t.id})">✅ ДОСТАВЛЕНО</button>
+                    <a href="https://www.google.com/maps/dir/Current+Location/${encodeURIComponent(t.a+' '+t.city)}" target="_blank" class="btn-n b-go">GOOGLE MAPS</a>
+                    <button class="btn-n b-done" onclick="done(${t.id})">✅ ЗАВЕРШИТЬ ДОСТАВКУ</button>
                 </div></div>`).join('');
 
         } else if (activeTab === 'clients') {
-            cont.innerHTML = clients.map((c, i) => `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                <div><b>${c.name}</b><br><small class="hebrew" style="color:var(--gray)">${c.addr}</small></div>
-                <div style="display:flex; gap:15px;"><button onclick="editClient(${i})" style="background:none; border:none; font-size:1.3rem;">✏️</button><button onclick="delClient(${i})" style="background:none; border:none; font-size:1.3rem;">🗑️</button></div></div>`).join('');
-
+            cont.innerHTML = clients.map((c, i) => `<div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:25px;">
+                <div><b style="font-size:1.1rem;">${c.name}</b><br><small class="hebrew" style="color:var(--gray)">${c.addr}</small></div>
+                <div style="display:flex; gap:20px;"><button onclick="editClient(${i})" style="background:none; border:none; font-size:1.4rem;">✏️</button><button onclick="delClient(${i})" style="background:none; border:none; font-size:1.4rem;">🗑️</button></div></div>`).join('');
         } else if (activeTab === 'help') {
             cont.innerHTML = `
-                <div class="help-card sos-card"><b>🚨 ПРИ СИРЕНЕ</b><br>Остановись, выйди из машины, ляг на землю и закрой голову руками. Жди 10 минут!</div>
-                <div class="help-card"><b>📊 ЦЕВА АДОМ</b> Полоса в самом верху мониторит небо. Если она стала красной — немедленно в укрытие.</div>
-                <div class="help-card"><b>🗺️ МАРШРУТ</b> Кнопка Google строит путь от твоего текущего места. Зеленая кнопка сверху строит путь сразу по всем точкам.</div>
-                <div class="help-card"><b>✅ ГОТОВО</b> Нажимай на галочку, когда отдала товар. Заказ уйдет в архив.</div>`;
+                <div class="card" style="background:var(--danger); border:none; color:white;"><b>🚨 БЕЗОПАСНОСТЬ</b><br><small>При сирене остановитесь, выйдите из авто и лягте на землю. Ждите 10 минут!</small></div>
+                <div class="card"><b>🔔 МОНИТОРИНГ</b><br><small>Верхняя панель проверяет небо каждые 4 сек. Если она покраснеет — будет звук сирены.</small></div>
+                <div class="card"><b>📦 УПРАВЛЕНИЕ</b><br><small>Добавляйте клиентов в БАЗУ, а затем выбирайте их для МАРШРУТА. После доставки жмите галочку.</small></div>`;
         } else {
-            cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.5;"><b>${a.n}</b><br><small>${a.a}</small></div>`).join('');
+            cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.4;"><b>${a.n}</b><br><small>${a.a}</small></div>`).join('');
         }
     }
 
@@ -194,7 +222,7 @@
             ['f-name','f-phone','f-addr'].forEach(id => document.getElementById(id).value = "");
             openModal('win-client');
         } else {
-            if (!clients.length) return alert("Сначала добавь клиентов в базу!");
+            if (!clients.length) return alert("Сначала заполните Базу клиентов!");
             document.getElementById('f-select').innerHTML = clients.map((c, i) => `<option value="${i}">[${c.city}] ${c.name}</option>`).join('');
             openModal('win-order');
         }
@@ -202,25 +230,24 @@
 
     function saveClient() {
         const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, ph = document.getElementById('f-phone').value, city = document.getElementById('f-city').value, idx = parseInt(document.getElementById('f-idx').value);
-        if (!n || !a) return alert("Заполни имя и адрес!");
-        const obj = {name:n, addr:a, phone:ph, city:city};
-        if (idx > -1) clients[idx] = obj; else clients.push(obj);
-        localStorage.setItem('cl_v161', JSON.stringify(clients)); closeModal(); render();
+        if (!n || !a) return alert("Введите имя и адрес!");
+        if (idx > -1) clients[idx] = {name:n, addr:a, phone:ph, city:city}; else clients.push({name:n, addr:a, phone:ph, city:city});
+        localStorage.setItem('cl_v162', JSON.stringify(clients)); closeModal(); render();
     }
 
     function addTask() {
         const c = clients[document.getElementById('f-select').value];
         tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone});
-        localStorage.setItem('tk_v161', JSON.stringify(tasks)); closeModal(); render();
+        localStorage.setItem('tk_v162', JSON.stringify(tasks)); closeModal(); render();
     }
 
-    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v161', JSON.stringify(tasks)); render(); }
-    function done(id) { let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); localStorage.setItem('tk_v161', JSON.stringify(tasks)); localStorage.setItem('ar_v161', JSON.stringify(archive)); render(); }
+    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v162', JSON.stringify(tasks)); render(); }
+    function done(id) { let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); localStorage.setItem('tk_v162', JSON.stringify(tasks)); localStorage.setItem('ar_v162', JSON.stringify(archive)); render(); }
     function editClient(i) { 
         const c = clients[i]; document.getElementById('f-idx').value = i; document.getElementById('f-name').value = c.name;
         document.getElementById('f-phone').value = c.phone; document.getElementById('f-addr').value = c.addr; document.getElementById('f-city').value = c.city; openModal('win-client'); 
     }
-    function delClient(i) { if(confirm("Удалить из базы?")) { clients.splice(i,1); localStorage.setItem('cl_v161', JSON.stringify(clients)); render(); } }
+    function delClient(i) { if(confirm("Удалить из базы?")) { clients.splice(i,1); localStorage.setItem('cl_v162', JSON.stringify(clients)); render(); } }
 
     render();
 </script>
