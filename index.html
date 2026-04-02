@@ -3,236 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Expeditor Pro v18.8</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Expeditor">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2991/2991231.png">
+
+    <title>Expeditor Elite v17.8</title>
     <style>
-        :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --success: #32D74B; --danger: #FF453A; --waze: #33CCFF; --magic: linear-gradient(45deg, #FF375F, #BF5AF2); }
+        :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --danger: #FF453A; --success: #32D74B; --waze: #33CCFF; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: 110px; padding-top: env(safe-area-inset-top); overflow-x: hidden; }
         
-        header { padding: 15px 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .magic-btn { background: var(--magic); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 0.7rem; border: none; box-shadow: 0 4px 15px rgba(191,90,242,0.3); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: 120px; overflow-x: hidden; padding-top: env(safe-area-inset-top); }
         
+        #alert-status { 
+            background: #151515; padding: 15px 10px; text-align: center; font-size: 0.85rem; 
+            font-weight: 800; border-bottom: 1px solid var(--border); color: var(--success); 
+            position: sticky; top: 0; z-index: 2000; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .alert-active { background: var(--danger) !important; color: white !important; animation: blink 0.6s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        header { padding: 15px 20px; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 50px; z-index: 1000; }
+        .logo-text { font-weight: 900; font-size: 1.3rem; color: white; }
+        
+        .route-all-btn { background: #34C759; color: #000; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 0.7rem; text-decoration: none; border: none; }
+        .sos-btn { background: rgba(255, 69, 58, 0.2); color: var(--danger); padding: 8px 15px; border-radius: 10px; font-weight: 800; border: 1px solid var(--danger); font-size: 0.7rem; text-decoration: none; }
+
         .tabs { display: flex; background: #1C1C1E; margin: 15px; border-radius: 14px; padding: 3px; border: 0.5px solid var(--border); }
-        .tab-btn { flex: 1; border: none; background: none; padding: 12px; color: var(--gray); font-weight: 600; border-radius: 11px; font-size: 0.65rem; }
+        .tab-btn { flex: 1; border: none; background: none; padding: 12px; color: var(--gray); font-weight: 600; border-radius: 11px; font-size: 0.7rem; }
         .tab-btn.active { background: #3A3A3C; color: white; }
 
         .container { padding: 0 15px; }
-        .card { background: var(--card-bg); border-radius: 22px; margin-bottom: 12px; padding: 18px; border: 0.5px solid var(--border); transition: 0.3s; }
+        .card { background: #1C1C1E; border-radius: 24px; margin-bottom: 15px; padding: 20px; border: 0.5px solid var(--border); position: relative; }
         
-        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-n { border-radius: 14px; padding: 16px; text-decoration: none; font-size: 0.75rem; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; border: none; text-align: center; }
-        .b-waze { background: var(--waze); color: #000; }
-        .b-call { background: #2C2C2E; border: 0.5px solid var(--border); }
-        .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 8px; }
+        .help-title { color: var(--primary); font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .help-text { color: #D1D1D6; font-size: 0.9rem; line-height: 1.4; }
+        
+        .move-controls { display: flex; gap: 8px; margin-bottom: 12px; }
+        .move-btn { background: #2C2C2E; border: 1px solid var(--border); color: white; width: 45px; height: 38px; border-radius: 10px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
 
-        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px 20px 40px; border-radius: 25px 25px 0 0; z-index: 3000; border-top: 1px solid var(--border); max-height: 90vh; overflow-y: auto; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
+        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-n { border-radius: 14px; padding: 16px; text-decoration: none; font-size: 0.75rem; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; border: none; }
+        .b-waze { background: var(--waze); color: #000; }
+        .b-go { background: var(--primary); }
+        .b-call { background: #2C2C2E; grid-column: span 2; border: 0.5px solid var(--border); }
+        .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 10px; }
+
+        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px 20px 40px; border-radius: 30px 30px 0 0; z-index: 3000; border-top: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
         input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; }
-        
-        .find-gps { background: #5856D6; color: white; padding: 12px; border-radius: 12px; border: none; width: 100%; margin-bottom: 15px; font-weight: 700; font-size: 0.8rem; }
-        
-        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; border: none; z-index: 1500; box-shadow: 0 5px 20px rgba(10,132,255,0.4); }
+        .city-chip { background: #2C2C2E; border: 1px solid var(--border); color: var(--gray); padding: 10px 15px; border-radius: 12px; font-size: 0.75rem; margin-right: 5px; border: none; }
+        .city-chip.active { background: var(--primary); color: white; }
+
+        .fab { position: fixed; bottom: 35px; right: 25px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: none; z-index: 1500; }
         .hebrew { direction: rtl; text-align: right; }
-        .city-chip { padding: 10px 15px; border-radius: 10px; border: none; color: white; font-size: 0.7rem; flex-shrink: 0; white-space: nowrap; }
     </style>
 </head>
-<body>
+<body onclick="initAudio()">
+
+<div id="alert-status">● ПРОВЕРКА ВОЗДУХА...</div>
 
 <header>
-    <button class="magic-btn" onclick="optimizeRoute()">✨ РАСЧИТАТЬ ПУТЬ</button>
-    <div style="font-weight:900; letter-spacing:1px;">EXPEDITOR v18.8</div>
-    <div style="width: 20px;"></div>
+    <button class="route-all-btn" onclick="openFullRoute()">🗺️ ВЕСЬ МАРШРУТ</button>
+    <div class="logo-text">Expeditor</div>
+    <a href="https://www.google.com/maps/search/shelter" class="sos-btn" target="_blank">🛡️ SOS</a>
 </header>
 
 <div class="tabs">
     <button id="t-tasks" class="tab-btn active" onclick="setTab('tasks')">МАРШРУТ</button>
     <button id="t-clients" class="tab-btn" onclick="setTab('clients')">БАЗА</button>
     <button id="t-archive" class="tab-btn" onclick="setTab('archive')">АРХИВ</button>
-    <button id="t-help" class="tab-btn" onclick="setTab('help')">ПОМОЩЬ</button>
+    <button id="t-help" class="tab-btn" onclick="setTab('help')">📖 ПОМОЩЬ</button>
 </div>
 
-<div id="filter-area" style="display:flex; gap:8px; overflow-x:auto; padding:0 15px 15px; scrollbar-width:none; -ms-overflow-style:none;"></div>
+<div id="filter-area" style="display: flex; gap: 8px; overflow-x: auto; padding: 0 15px 15px; scrollbar-width: none;"></div>
+<div id="main-content" class="container"></div>
 
-<main id="main-content" class="container"></main>
-
-<button class="fab" onclick="clickPlus()">+</button>
-
-<div id="win-client" class="modal">
-    <h3 style="text-align:center;" id="modal-title">Карточка</h3>
-    <input type="hidden" id="f-idx" value="-1">
-    <select id="f-city"><option>Ашкелон</option><option>Ашдод</option><option>Кирьят-Гат</option><option>Другой</option></select>
-    <input type="text" id="f-name" placeholder="Имя">
-    <input type="tel" id="f-phone" placeholder="Телефон">
-    <input type="text" id="f-addr" class="hebrew" placeholder="Адрес (иврит)">
-    <button class="find-gps" onclick="lookupGPS()">🔍 НАЙТИ КООРДИНАТЫ</button>
-    <input type="text" id="f-gps" placeholder="Вставь сюда (цифры)">
-    <button class="btn-n" style="width:100%; background:var(--primary);" onclick="saveClient()">СОХРАНИТЬ</button>
-    <button class="btn-n" style="width:100%; background:none; color:var(--gray);" onclick="closeModal()">ОТМЕНА</button>
-</div>
+<button id="fab-plus" class="fab" onclick="clickPlus()">+</button>
 
 <div id="win-order" class="modal">
-    <h3 style="text-align:center;">Добавить в план</h3>
-    <div id="order-city-selector" style="display:flex; gap:5px; overflow-x:auto; margin-bottom:15px;"></div>
-    <select id="f-select" size="10" style="background:#000;"></select>
-    <button class="btn-n" style="width:100%; background:var(--primary);" onclick="addTask()">В МАРШРУТ</button>
-    <button class="btn-n" style="width:100%; background:none; color:var(--gray);" onclick="closeModal()">ЗАКРЫТЬ</button>
+    <h3 style="text-align:center; margin-top:0;">Добавить в план</h3>
+    <div style="display:flex; gap:5px; overflow-x:auto; margin-bottom:15px;" id="order-city-selector"></div>
+    <select id="f-select" size="6" style="height: auto;"></select>
+    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="addTask()">ДОБАВИТЬ В МАРШРУТ</button>
+    <button class="btn-n" style="width:100%; background:none; margin:10px 0; color:var(--gray)" onclick="closeModal()">ЗАКРЫТЬ</button>
+</div>
+
+<div id="win-client" class="modal">
+    <h3 style="text-align:center; margin-top:0;">Новый клиент</h3>
+    <input type="hidden" id="f-idx" value="-1">
+    <select id="f-city"><option>Ашкелон</option><option>Ашдод</option><option>Кирьят-Гат</option><option>Другой</option></select>
+    <input type="text" id="f-name" placeholder="Название магазина">
+    <input type="tel" id="f-phone" placeholder="Телефон">
+    <input type="text" id="f-addr" class="hebrew" placeholder="Адрес (иврит)">
+    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="saveClient()">СОХРАНИТЬ В БАЗУ</button>
+    <button class="btn-n" style="width:100%; background:none; margin:10px 0; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <script>
-    let activeTab = 'tasks', filterCity = 'Все', modalCity = 'Ашкелон';
-    let clients = JSON.parse(localStorage.getItem('exp_v18_cl')) || [];
-    let tasks = JSON.parse(localStorage.getItem('exp_v18_tk')) || [];
-    let archive = JSON.parse(localStorage.getItem('exp_v18_ar')) || [];
+    let activeTab = 'tasks', filterCity = 'Все', modalCity = 'Ашкелон', audioCtx = null;
+    let clients = JSON.parse(localStorage.getItem('cl_v178')) || [];
+    let tasks = JSON.parse(localStorage.getItem('tk_v178')) || [];
+    let archive = JSON.parse(localStorage.getItem('ar_v178')) || [];
     const citiesList = ['Ашкелон', 'Ашдод', 'Кирьят-Гат', 'Другой'];
 
-    function setTab(t) { activeTab = t; render(); }
+    async function checkAlerts() {
+        const status = document.getElementById('alert-status');
+        try {
+            const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.oref.org.il/WarningMessages/History/AlertsHistory.json') + '&t=' + Date.now());
+            const json = await response.json();
+            const alerts = JSON.parse(json.contents);
+            // Проверка городов
+            const danger = alerts.find(a => ["אשקלון", "אשדוד", "קרית גת"].includes(a.data));
+            if (danger) {
+                status.innerHTML = `🚨 ЦЕВА АДОМ: ${danger.data}!`;
+                status.classList.add('alert-active');
+            } else {
+                status.innerHTML = "● НЕБО ЧИСТОЕ (ONLINE)";
+                status.classList.remove('alert-active');
+            }
+        } catch (e) { status.innerHTML = "● МОНИТОРИНГ АКТИВЕН"; }
+    }
+    setInterval(checkAlerts, 5000);
+
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+    function setTab(t) { 
+        activeTab = t; 
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-'+t));
+        render(); 
+    }
+
+    function openFullRoute() {
+        let list = tasks.filter(t => filterCity === 'Все' || t.city === filterCity);
+        if (list.length === 0) return alert("Список пуст.");
+        let dest = encodeURIComponent(list[list.length-1].a + " " + list[list.length-1].city);
+        let baseUrl = "https://www.google.com/maps/dir/?api=1&destination=" + dest;
+        if (list.length > 1) {
+            let waypoints = list.slice(0, -1).map(t => encodeURIComponent(t.a + " " + t.city)).join('|');
+            baseUrl += "&waypoints=" + waypoints;
+        }
+        window.open(baseUrl, '_blank');
+    }
 
     function render() {
-        const cont = document.getElementById('main-content');
-        const filt = document.getElementById('filter-area');
+        const cont = document.getElementById('main-content'), filt = document.getElementById('filter-area');
         cont.innerHTML = ""; filt.innerHTML = "";
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-'+activeTab));
 
         if (activeTab === 'tasks') {
-            filt.innerHTML = ['Все', ...citiesList].map(c => `<button class="city-chip" style="background:${filterCity===c?'var(--primary)':'#2C2C2E'};" onclick="filterCity='${c}'; render();">${c}</button>`).join('');
+            filt.innerHTML = ['Все', ...citiesList].map(c => `<button class="city-chip ${filterCity === c ? 'active' : ''}" onclick="filterCity='${c}'; render();">${c}</button>`).join('');
+            let list = tasks.map((t, i) => ({...t, origIdx: i})).filter(t => filterCity === 'Все' || t.city === filterCity);
             
-            let displayTasks = tasks.map((t, i) => ({...t, realIdx: i})).filter(t => filterCity === 'Все' || t.city === filterCity);
-            
-            if(!displayTasks.length) cont.innerHTML = '<p style="text-align:center; color:gray; margin-top:50px;">Маршрут пуст.</p>';
-            
-            cont.innerHTML += displayTasks.map(t => `
+            cont.innerHTML += list.map((t) => `
                 <div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <div style="display:flex; gap:8px;">
-                            <button onclick="moveTask(${t.realIdx},-1)" style="background:#2C2C2E; border:none; color:white; width:40px; height:40px; border-radius:10px;">↑</button>
-                            <button onclick="moveTask(${t.realIdx},1)" style="background:#2C2C2E; border:none; color:white; width:40px; height:40px; border-radius:10px;">↓</button>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="move-controls">
+                            ${t.origIdx > 0 ? `<button class="move-btn" onclick="moveTask(${t.origIdx}, -1)">↑</button>` : ''}
+                            ${t.origIdx < tasks.length - 1 ? `<button class="move-btn" onclick="moveTask(${t.origIdx}, 1)">↓</button>` : ''}
                         </div>
-                        <button onclick="delTask(${t.id})" style="background:none; border:none; color:var(--danger); font-size:1.5rem;">✕</button>
+                        <button onclick="delTask(${t.id})" style="background:none; border:none; color:var(--gray); font-size:1.5rem;">×</button>
                     </div>
-                    <b>${t.n} ${t.gps ? '📍' : '🏠'}</b>
-                    <div class="hebrew" style="color:var(--gray); margin:5px 0;">${t.a} (${t.city})</div>
+                    <b>${t.n}</b>
+                    <div class="hebrew" style="color:var(--gray); margin:10px 0;">${t.a} (${t.city})</div>
                     <div class="nav-grid">
-                        <a href="tel:${t.ph}" class="btn-n b-call">📞 СВЯЗЬ</a>
-                        <a href="https://waze.com/ul?${t.gps ? 'll='+t.gps : 'q='+encodeURIComponent(t.a+' '+t.city)}&navigate=yes" class="btn-n b-waze">🚗 WAZE</a>
-                        <button class="btn-n b-done" onclick="complete(${t.id})">✅ ГОТОВО</button>
+                        <a href="tel:${t.ph}" class="btn-n b-call">📞 ПОЗВОНИТЬ</a>
+                        <a href="waze://?q=${encodeURIComponent(t.a+' '+t.city)}&navigate=yes" class="btn-n b-waze">WAZE</a>
+                        <a href="https://www.google.com/maps/search/${encodeURIComponent(t.a+' '+t.city)}" target="_blank" class="btn-n b-go">GOOGLE</a>
+                        <button class="btn-n b-done" onclick="done(${t.id})">✅ ГОТОВО</button>
                     </div>
                 </div>`).join('');
         } else if (activeTab === 'clients') {
-            cont.innerHTML = clients.map((c, i) => `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><div><b>${c.name}</b><br><small>${c.city}</small></div><button onclick="edit(${i})" style="background:#2C2C2E; border:none; padding:12px; border-radius:12px;">✏️</button></div>`).join('');
+            cont.innerHTML = clients.map((c, i) => `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                <div><b>${c.name}</b><br><small class="hebrew" style="color:var(--gray)">${c.addr} (${c.city})</small></div>
+                <button onclick="editClient(${i})" style="background:none; border:none; font-size:1.2rem;">✏️</button></div>`).join('');
         } else if (activeTab === 'archive') {
-            cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.5;"><b>${a.n}</b><br><small>${a.a}</small></div>`).join('');
+            cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.5;"><b>${a.n}</b><br>${a.a}</div>`).join('');
         } else if (activeTab === 'help') {
-            cont.innerHTML = `<div class="card"><h3>Совет по расчету:</h3>Чтобы "Магия пути" работала точно, вставляйте координаты из карт. Тогда программа рассчитает маршрут по метрам, а не просто по городам. Сначала будут ближайшие к Ашкелону клиенты.</div>`;
+            cont.innerHTML = `
+                <div class="card"><div class="help-title">🗺️ Весь маршрут</div><div class="help-text">Кнопка строит путь в Google Maps через все точки списка по порядку.</div></div>
+                <div class="card"><div class="help-title">🏙️ Фильтр</div><div class="help-text">Выбирай город сверху, чтобы видеть только нужные магазины.</div></div>
+                <div class="card"><div class="help-title">🛡️ SOS</div><div class="help-text">Если панель вверху замигала красным — это Цева Адом. Жми SOS для поиска укрытий.</div></div>
+                <div class="card"><div class="help-title">↕️ Порядок</div><div class="help-text">Стрелками ↑↓ можно менять очередность поездки.</div></div>
+                <div class="card"><div class="help-title">✅ Готово</div><div class="help-text">Жми, когда разгрузилась. Клиент уйдет в архив, чтобы не мешать.</div></div>`;
         }
     }
 
-    function lookupGPS() {
-        const a = document.getElementById('f-addr').value, c = document.getElementById('f-city').value;
-        if(!a) return alert("Введите адрес!");
-        window.open(`https://www.google.com/maps/search/${encodeURIComponent(a + ' ' + c)}`, '_blank');
+    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+    
+    function clickPlus() { 
+        if(activeTab==='clients') { 
+            document.getElementById('f-idx').value="-1"; 
+            document.getElementById('f-name').value=""; document.getElementById('f-phone').value=""; document.getElementById('f-addr').value="";
+            document.getElementById('win-client').style.display='block'; 
+        } else { 
+            updateOrderModalCities(); 
+            document.getElementById('win-order').style.display='block'; 
+        } 
     }
-
-    // ЛОГИКА РАСЧЕТА МАРШРУТА
-    function optimizeRoute() {
-        if (tasks.length < 2) return alert("Мало точек для расчета!");
-        
-        let startPos = { lat: 31.6688, lon: 34.5743 }; // Ашкелон
-        let unvisited = [...tasks];
-        let optimized = [];
-
-        // 1. Сначала сортируем тех, у кого есть координаты
-        while (unvisited.length > 0) {
-            let closestIdx = -1;
-            let minDist = Infinity;
-
-            unvisited.forEach((task, idx) => {
-                if (task.gps) {
-                    let coords = task.gps.split(',').map(Number);
-                    let d = Math.sqrt(Math.pow(coords[0] - startPos.lat, 2) + Math.pow(coords[1] - startPos.lon, 2));
-                    if (d < minDist) { minDist = d; closestIdx = idx; }
-                }
-            });
-
-            // Если нашли точку с GPS
-            if (closestIdx !== -1) {
-                let next = unvisited.splice(closestIdx, 1)[0];
-                optimized.push(next);
-                let coords = next.gps.split(',').map(Number);
-                startPos = { lat: coords[0], lon: coords[1] };
-            } else {
-                // Если у оставшихся нет GPS, просто сортируем по городам (Ашкелон -> Ашдод -> Остальные)
-                const priority = {"Ашкелон": 1, "Ашдод": 2, "Кирьят-Гат": 3, "Другой": 4};
-                unvisited.sort((a, b) => (priority[a.city] || 9) - (priority[b.city] || 9));
-                optimized = [...optimized, ...unvisited];
-                unvisited = [];
-            }
-        }
-
-        tasks = optimized;
-        localStorage.setItem('exp_v18_tk', JSON.stringify(tasks));
-        render();
-        alert("Маршрут пересчитан!");
-    }
-
-    function moveTask(idx, dir) {
-        let nIdx = idx + dir;
-        if(nIdx >= 0 && nIdx < tasks.length) {
-            [tasks[idx], tasks[nIdx]] = [tasks[nIdx], tasks[idx]];
-            localStorage.setItem('exp_v18_tk', JSON.stringify(tasks)); render();
-        }
-    }
-
-    function clickPlus() {
-        if(activeTab === 'clients') {
-            document.getElementById('modal-title').innerText = "Новый клиент";
-            document.getElementById('f-idx').value = "-1";
-            document.getElementById('f-name').value = ""; document.getElementById('f-addr').value = ""; document.getElementById('f-gps').value = ""; document.getElementById('f-phone').value = "";
-            document.getElementById('win-client').style.display = 'block';
-        } else {
-            updateModalList();
-            document.getElementById('win-order').style.display = 'block';
-        }
-    }
-
-    function updateModalList() {
-        const sel = document.getElementById('order-city-selector');
-        sel.innerHTML = citiesList.map(c => `<button onclick="modalCity='${c}';updateModalList();" style="border:none; padding:10px; border-radius:8px; background:${modalCity===c?'var(--primary)':'#2C2C2E'}; color:white; font-size:0.7rem;">${c}</button>`).join('');
+    
+    function updateOrderModalCities() {
+        const selector = document.getElementById('order-city-selector');
+        selector.innerHTML = citiesList.map(c => `<button class="city-chip ${modalCity === c ? 'active' : ''}" onclick="modalCity='${c}'; updateOrderModalCities();">${c}</button>`).join('');
         const filtered = clients.filter(c => c.city === modalCity);
-        document.getElementById('f-select').innerHTML = filtered.map(c => `<option value="${clients.indexOf(c)}">${c.name}</option>`).join('');
+        const select = document.getElementById('f-select');
+        select.innerHTML = filtered.map(c => `<option value="${clients.indexOf(c)}">${c.name}</option>`).join('');
     }
 
     function saveClient() {
-        const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, p = document.getElementById('f-phone').value, c = document.getElementById('f-city').value, g = document.getElementById('f-gps').value.replace(/\s/g, ''), i = parseInt(document.getElementById('f-idx').value);
-        if(!n || !a) return;
-        let obj = {name:n, addr:a, phone:p, city:c, gps:g};
-        if(i > -1) clients[i] = obj; else clients.push(obj);
-        localStorage.setItem('exp_v18_cl', JSON.stringify(clients));
-        closeModal(); render();
+        const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, ph = document.getElementById('f-phone').value, city = document.getElementById('f-city').value, idx = parseInt(document.getElementById('f-idx').value);
+        if (!n || !a) return;
+        if (idx > -1) clients[idx] = {name:n, addr:a, phone:ph, city:city}; else clients.push({name:n, addr:a, phone:ph, city:city});
+        localStorage.setItem('cl_v178', JSON.stringify(clients)); closeModal(); render();
     }
 
     function addTask() {
-        const idx = document.getElementById('f-select').value; if(idx==="") return;
-        const c = clients[idx];
-        tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone, gps: c.gps});
-        localStorage.setItem('exp_v18_tk', JSON.stringify(tasks));
-        closeModal(); render();
+        const val = document.getElementById('f-select').value;
+        if (val==="") return;
+        const c = clients[val];
+        tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone});
+        localStorage.setItem('tk_v178', JSON.stringify(tasks)); closeModal(); render();
     }
 
-    function edit(i) {
-        const c = clients[i];
-        document.getElementById('modal-title').innerText = "Изменить";
-        document.getElementById('f-idx').value = i;
-        document.getElementById('f-name').value = c.name; document.getElementById('f-addr').value = c.addr; document.getElementById('f-phone').value = c.phone; document.getElementById('f-city').value = c.city; document.getElementById('f-gps').value = c.gps || "";
-        document.getElementById('win-client').style.display = 'block';
+    function moveTask(index, dir) {
+        let newIdx = index + dir;
+        if (newIdx >= 0 && newIdx < tasks.length) {
+            [tasks[index], tasks[newIdx]] = [tasks[newIdx], tasks[index]];
+            localStorage.setItem('tk_v178', JSON.stringify(tasks));
+            render();
+        }
     }
 
-    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('exp_v18_tk', JSON.stringify(tasks)); render(); }
-    function complete(id) { 
-        let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); 
-        localStorage.setItem('exp_v18_tk', JSON.stringify(tasks)); localStorage.setItem('exp_v18_ar', JSON.stringify(archive)); render(); 
-    }
-    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
+    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v178', JSON.stringify(tasks)); render(); }
+    function done(id) { let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); localStorage.setItem('tk_v178', JSON.stringify(tasks)); localStorage.setItem('ar_v178', JSON.stringify(archive)); render(); }
+    function editClient(i) { const c = clients[i]; document.getElementById('f-idx').value = i; document.getElementById('f-name').value = c.name; document.getElementById('f-phone').value = c.phone; document.getElementById('f-addr').value = c.addr; document.getElementById('f-city').value = c.city; document.getElementById('win-client').style.display = 'block'; }
+
     render();
+    checkAlerts();
 </script>
 </body>
 </html>
