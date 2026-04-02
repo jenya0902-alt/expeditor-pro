@@ -71,7 +71,7 @@
 
 <div class="tabs">
     <button id="t-tasks" class="tab-btn active" onclick="setTab('tasks')">МАРШРУТ</button>
-    <button id="t-clients" class="tab-btn" onclick="setTab('clients')">БАЗА</button>
+    <button id="t-clients" class="tab-btn" onclick="setTab('clients')">Клиент</button>
     <button id="t-archive" class="tab-btn" onclick="setTab('archive')">АРХИВ</button>
     <button id="t-help" class="tab-btn" onclick="setTab('help')">📖 ПОМОЩЬ</button>
 </div>
@@ -93,7 +93,7 @@
     <h3 style="text-align:center; margin-top:0;">Новый клиент</h3>
     <input type="hidden" id="f-idx" value="-1">
     <select id="f-city"><option>Ашкелон</option><option>Ашдод</option><option>Кирьят-Гат</option><option>Другой</option></select>
-    <input type="text" id="f-name" placeholder="Название магазина">
+    <input type="text" id="f-name" placeholder="Имя">
     <input type="tel" id="f-phone" placeholder="Телефон">
     <input type="text" id="f-addr" class="hebrew" placeholder="Адрес (иврит)">
     <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="saveClient()">СОХРАНИТЬ В БАЗУ</button>
