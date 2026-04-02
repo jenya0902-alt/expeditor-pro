@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Expeditor Elite v16.4</title>
+    <title>Expeditor Elite v16.5</title>
     <style>
         :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --danger: #FF453A; --success: #32D74B; --waze: #33CCFF; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
@@ -15,9 +15,7 @@
 
         header { padding: 25px 20px 15px; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 37px; z-index: 1000; }
         .logo-text { font-weight: 900; font-size: 1.3rem; background: linear-gradient(180deg, #FFF 0%, #AAA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        /* Кнопка SOS теперь ведет на КАРТУ убежищ */
-        .sos-btn { background: rgba(255, 69, 58, 0.2); color: var(--danger); padding: 8px 15px; border-radius: 10px; font-weight: 800; border: 1px solid var(--danger); font-size: 0.7rem; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+        .sos-btn { background: rgba(255, 69, 58, 0.2); color: var(--danger); padding: 8px 15px; border-radius: 10px; font-weight: 800; border: 1px solid var(--danger); font-size: 0.7rem; text-decoration: none; }
         
         .tabs { display: flex; background: #1C1C1E; margin: 15px; border-radius: 14px; padding: 3px; border: 0.5px solid var(--border); }
         .tab-btn { flex: 1; border: none; background: none; padding: 10px; color: var(--gray); font-weight: 600; border-radius: 11px; font-size: 0.65rem; }
@@ -34,12 +32,16 @@
         .b-call { background: #2C2C2E; grid-column: span 2; border: 0.5px solid var(--border); }
         .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 10px; padding: 18px; }
 
-        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 30px 20px 60px; border-radius: 30px 30px 0 0; z-index: 2000; border-top: 0.5px solid var(--border); }
-        input, select { width: 100%; padding: 18px; margin-bottom: 15px; border-radius: 15px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; }
-        .hebrew { direction: rtl; text-align: right; }
+        /* Модальные окна и выбор города */
+        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px 20px 40px; border-radius: 30px 30px 0 0; z-index: 2000; border-top: 0.5px solid var(--border); max-height: 90vh; overflow-y: auto; }
+        input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; }
+        .city-selector-mini { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
+        .city-chip { background: #2C2C2E; border: 1px solid var(--border); color: var(--gray); padding: 8px 12px; border-radius: 10px; font-size: 0.7rem; white-space: nowrap; }
+        .city-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
 
         .fab { position: fixed; bottom: 35px; right: 25px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: none; z-index: 1500; box-shadow: 0 10px 25px rgba(10, 132, 255, 0.4); }
         footer { text-align: center; color: #3A3A3C; font-size: 0.6rem; margin: 40px 0; letter-spacing: 2px; }
+        .hebrew { direction: rtl; text-align: right; }
     </style>
 </head>
 <body onclick="initAudio()">
@@ -63,7 +65,7 @@
 <div id="main-content" class="container"></div>
 
 <button id="fab-plus" class="fab" onclick="clickPlus()">+</button>
-<footer>Jenya Ochakovski • v16.4</footer>
+<footer>Jenya Ochakovski • v16.5</footer>
 
 <div id="win-client" class="modal">
     <h3 style="text-align:center; margin-top:0;">Карточка клиента</h3>
@@ -77,17 +79,20 @@
 </div>
 
 <div id="win-order" class="modal">
-    <h3 style="text-align:center; margin-top:0;">Добавить в план</h3>
-    <select id="f-select"></select>
+    <h3 style="text-align:center; margin-top:0;">Добавить город</h3>
+    <div class="city-selector-mini" id="order-city-selector"></div>
+    <select id="f-select" size="5" style="height: auto;"></select>
     <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="addTask()">В МАРШРУТ</button>
     <button class="btn-n" style="width:100%; background:none; margin:10px 0; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <script>
-    let activeTab = 'tasks', filterCity = 'Все', audioCtx = null;
-    let clients = JSON.parse(localStorage.getItem('cl_v164')) || [];
-    let tasks = JSON.parse(localStorage.getItem('tk_v164')) || [];
-    let archive = JSON.parse(localStorage.getItem('ar_v164')) || [];
+    let activeTab = 'tasks', filterCity = 'Все', modalCity = 'Ашкелон', audioCtx = null;
+    let clients = JSON.parse(localStorage.getItem('cl_v165')) || [];
+    let tasks = JSON.parse(localStorage.getItem('tk_v165')) || [];
+    let archive = JSON.parse(localStorage.getItem('ar_v165')) || [];
+
+    const citiesList = ['Ашкелон', 'Ашдод', 'Кирьят-Гат', 'Другой'];
 
     async function checkAlerts() {
         const status = document.getElementById('alert-status');
@@ -104,13 +109,12 @@
                 document.body.style.background = "#300";
                 playSiren();
             } else {
-                status.innerHTML = "● НЕБО ЧИСТОЕ (МОНИТОРИНГ)";
+                status.innerHTML = "● НЕБО ЧИСТОЕ (ONLINE)";
                 status.classList.remove('alert-active');
                 document.body.style.background = "var(--bg)";
             }
         } catch (e) {
-            status.innerHTML = "● МОНИТОРИНГ ONLINE";
-            status.style.color = "var(--success)";
+            status.innerHTML = "● МОНИТОРИНГ АКТИВЕН";
         }
     }
 
@@ -128,8 +132,7 @@
     setInterval(checkAlerts, 5000);
 
     const closeModal = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-    const openModal = (id) => { closeModal(); document.getElementById(id).style.display = 'block'; };
-
+    
     function setTab(t) { 
         activeTab = t; 
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-'+t));
@@ -142,8 +145,7 @@
         cont.innerHTML = ""; filt.innerHTML = "";
 
         if (activeTab === 'tasks') {
-            const cities = ['Все', 'Ашкелон', 'Ашдод', 'Кирьят-Гат', 'Другой'];
-            filt.innerHTML = cities.map(c => `<button class="f-chip ${filterCity === c ? 'active' : ''}" style="background:#1C1C1E; color:var(--gray); padding:8px 15px; border-radius:15px; border:0.5px solid var(--border); white-space:nowrap;" onclick="filterCity='${c}'; render();">${c}</button>`).join('');
+            filt.innerHTML = ['Все', ...citiesList].map(c => `<button class="city-chip ${filterCity === c ? 'active' : ''}" onclick="filterCity='${c}'; render();">${c}</button>`).join('');
             let list = filterCity === 'Все' ? tasks : tasks.filter(t => t.city === filterCity);
             
             if (list.length > 0) {
@@ -162,12 +164,11 @@
                 </div></div>`).join('');
         } else if (activeTab === 'clients') {
             cont.innerHTML = clients.map((c, i) => `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                <div><b>${c.name}</b><br><small class="hebrew" style="color:var(--gray)">${c.addr}</small></div>
+                <div><b>${c.name}</b><br><small class="hebrew" style="color:var(--gray)">${c.addr} (${c.city})</small></div>
                 <div style="display:flex; gap:15px;"><button onclick="editClient(${i})" style="background:none; border:none; font-size:1.4rem;">✏️</button><button onclick="delClient(${i})" style="background:none; border:none; font-size:1.4rem;">🗑️</button></div></div>`).join('');
         } else if (activeTab === 'help') {
-            cont.innerHTML = `
-                <div class="card" style="background:var(--danger); border:none;"><b>🚨 КАРТА УБЕЖИЩ</b><br><small>Кнопка SOS сверху теперь открывает Google Карты с нанесенными метками всех общественных убежищ.</small></div>
-                <div class="card"><b>📡 ТРЕВОГА</b><br><small>Мониторинг работает в фоне. Если в Ашкелоне или Ашдоде сирена — телефон запищит и экран покраснеет.</small></div>`;
+            cont.innerHTML = `<div class="card"><b>🏙️ ГОРОДА</b><br><small>В окне добавления теперь можно выбрать город сверху, чтобы не искать нужного клиента в общем списке.</small></div>
+            <div class="card" style="background:var(--danger); border:none;"><b>🚨 SOS КАРТА</b><br><small>Быстрый доступ к карте убежищ Ашкелона и окрестностей.</small></div>`;
         } else {
             cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.4;"><b>${a.n}</b><br><small>${a.a}</small></div>`).join('');
         }
@@ -177,34 +178,52 @@
         if (activeTab === 'clients') {
             document.getElementById('f-idx').value = "-1";
             ['f-name','f-phone','f-addr'].forEach(id => document.getElementById(id).value = "");
-            openModal('win-client');
+            document.getElementById('win-client').style.display = 'block';
         } else {
-            if (!clients.length) return alert("Добавь клиентов!");
-            document.getElementById('f-select').innerHTML = clients.map((c, i) => `<option value="${i}">[${c.city}] ${c.name}</option>`).join('');
-            openModal('win-order');
+            if (!clients.length) return alert("Добавь клиентов в базу!");
+            updateOrderModalCities();
+            document.getElementById('win-order').style.display = 'block';
         }
+    }
+
+    // ЛОГИКА ОКНА ДОБАВЛЕНИЯ
+    function updateOrderModalCities() {
+        const selector = document.getElementById('order-city-selector');
+        selector.innerHTML = citiesList.map(c => `<button class="city-chip ${modalCity === c ? 'active' : ''}" onclick="modalCity='${c}'; updateOrderModalCities();">${c}</button>`).join('');
+        
+        const filteredClients = clients.filter(c => c.city === modalCity);
+        const select = document.getElementById('f-select');
+        select.innerHTML = filteredClients.length 
+            ? filteredClients.map((c) => {
+                // Находим оригинальный индекс в массиве clients
+                const originalIndex = clients.indexOf(c);
+                return `<option value="${originalIndex}">${c.name}</option>`;
+            }).join('')
+            : `<option disabled>В этом городе нет клиентов</option>`;
     }
 
     function saveClient() {
         const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, ph = document.getElementById('f-phone').value, city = document.getElementById('f-city').value, idx = parseInt(document.getElementById('f-idx').value);
         if (!n || !a) return;
         if (idx > -1) clients[idx] = {name:n, addr:a, phone:ph, city:city}; else clients.push({name:n, addr:a, phone:ph, city:city});
-        localStorage.setItem('cl_v164', JSON.stringify(clients)); closeModal(); render();
+        localStorage.setItem('cl_v165', JSON.stringify(clients)); closeModal(); render();
     }
 
     function addTask() {
-        const c = clients[document.getElementById('f-select').value];
+        const val = document.getElementById('f-select').value;
+        if (val === "" || isNaN(val)) return alert("Выберите клиента из списка");
+        const c = clients[val];
         tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone});
-        localStorage.setItem('tk_v164', JSON.stringify(tasks)); closeModal(); render();
+        localStorage.setItem('tk_v165', JSON.stringify(tasks)); closeModal(); render();
     }
 
-    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v164', JSON.stringify(tasks)); render(); }
-    function done(id) { let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); localStorage.setItem('tk_v164', JSON.stringify(tasks)); localStorage.setItem('ar_v164', JSON.stringify(archive)); render(); }
+    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v165', JSON.stringify(tasks)); render(); }
+    function done(id) { let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); localStorage.setItem('tk_v165', JSON.stringify(tasks)); localStorage.setItem('ar_v163', JSON.stringify(archive)); render(); }
     function editClient(i) { 
         const c = clients[i]; document.getElementById('f-idx').value = i; document.getElementById('f-name').value = c.name;
-        document.getElementById('f-phone').value = c.phone; document.getElementById('f-addr').value = c.addr; document.getElementById('f-city').value = c.city; openModal('win-client'); 
+        document.getElementById('f-phone').value = c.phone; document.getElementById('f-addr').value = c.addr; document.getElementById('f-city').value = c.city; document.getElementById('win-client').style.display = 'block'; 
     }
-    function delClient(i) { if(confirm("Удалить?")) { clients.splice(i,1); localStorage.setItem('cl_v164', JSON.stringify(clients)); render(); } }
+    function delClient(i) { if(confirm("Удалить?")) { clients.splice(i,1); localStorage.setItem('cl_v165', JSON.stringify(clients)); render(); } }
 
     render();
     checkAlerts();
