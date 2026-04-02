@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Expeditor Pro v18.6</title>
+    <title>Expeditor Pro v18.8</title>
     <style>
-        :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --success: #32D74B; --waze: #33CCFF; --magic: linear-gradient(45deg, #FF375F, #BF5AF2); }
+        :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --success: #32D74B; --danger: #FF453A; --waze: #33CCFF; --magic: linear-gradient(45deg, #FF375F, #BF5AF2); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: 100px; padding-top: env(safe-area-inset-top); overflow-x: hidden; }
+        body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: 110px; padding-top: env(safe-area-inset-top); overflow-x: hidden; }
         
         header { padding: 15px 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .magic-btn { background: var(--magic); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 0.7rem; border: none; box-shadow: 0 4px 15px rgba(191,90,242,0.3); }
+        .magic-btn { background: var(--magic); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 0.7rem; border: none; box-shadow: 0 4px 15px rgba(191,90,242,0.3); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         
         .tabs { display: flex; background: #1C1C1E; margin: 15px; border-radius: 14px; padding: 3px; border: 0.5px solid var(--border); }
         .tab-btn { flex: 1; border: none; background: none; padding: 12px; color: var(--gray); font-weight: 600; border-radius: 11px; font-size: 0.65rem; }
         .tab-btn.active { background: #3A3A3C; color: white; }
 
         .container { padding: 0 15px; }
-        .card { background: var(--card-bg); border-radius: 22px; margin-bottom: 12px; padding: 18px; border: 0.5px solid var(--border); }
+        .card { background: var(--card-bg); border-radius: 22px; margin-bottom: 12px; padding: 18px; border: 0.5px solid var(--border); transition: 0.3s; }
         
         .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .btn-n { border-radius: 14px; padding: 16px; text-decoration: none; font-size: 0.75rem; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; border: none; text-align: center; }
@@ -25,20 +26,21 @@
         .b-call { background: #2C2C2E; border: 0.5px solid var(--border); }
         .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 8px; }
 
-        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px 20px 40px; border-radius: 25px 25px 0 0; z-index: 3000; border-top: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
+        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px 20px 40px; border-radius: 25px 25px 0 0; z-index: 3000; border-top: 1px solid var(--border); max-height: 90vh; overflow-y: auto; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
         input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; }
         
-        .find-gps { background: #5856D6; color: white; padding: 10px; border-radius: 10px; border: none; width: 100%; margin-bottom: 15px; font-weight: 700; font-size: 0.8rem; }
+        .find-gps { background: #5856D6; color: white; padding: 12px; border-radius: 12px; border: none; width: 100%; margin-bottom: 15px; font-weight: 700; font-size: 0.8rem; }
         
-        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; border: none; z-index: 1500; }
+        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; border: none; z-index: 1500; box-shadow: 0 5px 20px rgba(10,132,255,0.4); }
         .hebrew { direction: rtl; text-align: right; }
+        .city-chip { padding: 10px 15px; border-radius: 10px; border: none; color: white; font-size: 0.7rem; flex-shrink: 0; white-space: nowrap; }
     </style>
 </head>
 <body>
 
 <header>
-    <button class="magic-btn" onclick="optimizeRoute()">✨ МАГИЯ ПУТИ</button>
-    <div style="font-weight:900;">EXPEDITOR</div>
+    <button class="magic-btn" onclick="optimizeRoute()">✨ РАСЧИТАТЬ ПУТЬ</button>
+    <div style="font-weight:900; letter-spacing:1px;">EXPEDITOR v18.8</div>
     <div style="width: 20px;"></div>
 </header>
 
@@ -48,6 +50,8 @@
     <button id="t-archive" class="tab-btn" onclick="setTab('archive')">АРХИВ</button>
     <button id="t-help" class="tab-btn" onclick="setTab('help')">ПОМОЩЬ</button>
 </div>
+
+<div id="filter-area" style="display:flex; gap:8px; overflow-x:auto; padding:0 15px 15px; scrollbar-width:none; -ms-overflow-style:none;"></div>
 
 <main id="main-content" class="container"></main>
 
@@ -59,45 +63,53 @@
     <select id="f-city"><option>Ашкелон</option><option>Ашдод</option><option>Кирьят-Гат</option><option>Другой</option></select>
     <input type="text" id="f-name" placeholder="Имя">
     <input type="tel" id="f-phone" placeholder="Телефон">
-    <input type="text" id="f-addr" id="addr-field" class="hebrew" placeholder="Адрес (иврит)">
-    
+    <input type="text" id="f-addr" class="hebrew" placeholder="Адрес (иврит)">
     <button class="find-gps" onclick="lookupGPS()">🔍 НАЙТИ КООРДИНАТЫ</button>
-    
-    <input type="text" id="f-gps" placeholder="Вставь сюда (например: 31.6, 34.5)">
-    
-    <button class="btn-n" style="width:100%; background:var(--primary);" onclick="saveClient()">СОХРАНИТЬ В БАЗУ</button>
+    <input type="text" id="f-gps" placeholder="Вставь сюда (цифры)">
+    <button class="btn-n" style="width:100%; background:var(--primary);" onclick="saveClient()">СОХРАНИТЬ</button>
     <button class="btn-n" style="width:100%; background:none; color:var(--gray);" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <div id="win-order" class="modal">
     <h3 style="text-align:center;">Добавить в план</h3>
+    <div id="order-city-selector" style="display:flex; gap:5px; overflow-x:auto; margin-bottom:15px;"></div>
     <select id="f-select" size="10" style="background:#000;"></select>
     <button class="btn-n" style="width:100%; background:var(--primary);" onclick="addTask()">В МАРШРУТ</button>
     <button class="btn-n" style="width:100%; background:none; color:var(--gray);" onclick="closeModal()">ЗАКРЫТЬ</button>
 </div>
 
 <script>
-    let activeTab = 'tasks';
-    let clients = JSON.parse(localStorage.getItem('exp_v6')) || [];
-    let tasks = JSON.parse(localStorage.getItem('tk_v6')) || [];
-    let archive = JSON.parse(localStorage.getItem('ar_v6')) || [];
+    let activeTab = 'tasks', filterCity = 'Все', modalCity = 'Ашкелон';
+    let clients = JSON.parse(localStorage.getItem('exp_v18_cl')) || [];
+    let tasks = JSON.parse(localStorage.getItem('exp_v18_tk')) || [];
+    let archive = JSON.parse(localStorage.getItem('exp_v18_ar')) || [];
+    const citiesList = ['Ашкелон', 'Ашдод', 'Кирьят-Гат', 'Другой'];
 
     function setTab(t) { activeTab = t; render(); }
 
     function render() {
         const cont = document.getElementById('main-content');
-        cont.innerHTML = "";
+        const filt = document.getElementById('filter-area');
+        cont.innerHTML = ""; filt.innerHTML = "";
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-'+activeTab));
 
         if (activeTab === 'tasks') {
-            if(!tasks.length) cont.innerHTML = '<div style="text-align:center; color:gray; margin-top:50px;">Маршрут пуст. Жми +</div>';
-            cont.innerHTML += tasks.map((t, i) => `
+            filt.innerHTML = ['Все', ...citiesList].map(c => `<button class="city-chip" style="background:${filterCity===c?'var(--primary)':'#2C2C2E'};" onclick="filterCity='${c}'; render();">${c}</button>`).join('');
+            
+            let displayTasks = tasks.map((t, i) => ({...t, realIdx: i})).filter(t => filterCity === 'Все' || t.city === filterCity);
+            
+            if(!displayTasks.length) cont.innerHTML = '<p style="text-align:center; color:gray; margin-top:50px;">Маршрут пуст.</p>';
+            
+            cont.innerHTML += displayTasks.map(t => `
                 <div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <span style="color:var(--primary); font-weight:800;">#${i+1} ${t.gps ? '📍' : '🏠'}</span>
-                        <button onclick="removeTask(${t.id})" style="background:none; border:none; color:red;">✕</button>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div style="display:flex; gap:8px;">
+                            <button onclick="moveTask(${t.realIdx},-1)" style="background:#2C2C2E; border:none; color:white; width:40px; height:40px; border-radius:10px;">↑</button>
+                            <button onclick="moveTask(${t.realIdx},1)" style="background:#2C2C2E; border:none; color:white; width:40px; height:40px; border-radius:10px;">↓</button>
+                        </div>
+                        <button onclick="delTask(${t.id})" style="background:none; border:none; color:var(--danger); font-size:1.5rem;">✕</button>
                     </div>
-                    <b style="font-size:1.2rem;">${t.n}</b>
+                    <b>${t.n} ${t.gps ? '📍' : '🏠'}</b>
                     <div class="hebrew" style="color:var(--gray); margin:5px 0;">${t.a} (${t.city})</div>
                     <div class="nav-grid">
                         <a href="tel:${t.ph}" class="btn-n b-call">📞 СВЯЗЬ</a>
@@ -106,62 +118,95 @@
                     </div>
                 </div>`).join('');
         } else if (activeTab === 'clients') {
-            cont.innerHTML = clients.map((c, i) => `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><div><b>${c.name}</b><br><small>${c.city}</small></div><button onclick="edit(${i})" style="background:#2C2C2E; border:none; padding:10px; border-radius:10px;">✏️</button></div>`).join('');
+            cont.innerHTML = clients.map((c, i) => `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><div><b>${c.name}</b><br><small>${c.city}</small></div><button onclick="edit(${i})" style="background:#2C2C2E; border:none; padding:12px; border-radius:12px;">✏️</button></div>`).join('');
         } else if (activeTab === 'archive') {
-            cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.5;"><b>${a.n}</b></div>`).join('');
+            cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.5;"><b>${a.n}</b><br><small>${a.a}</small></div>`).join('');
         } else if (activeTab === 'help') {
-            cont.innerHTML = `<div class="card"><h3>Инструкция GPS:</h3>1. Введи адрес на иврите.<br>2. Нажми <b>Найти координаты</b>.<br>3. В Картах зажми пальцем точку, пока не появятся цифры.<br>4. Скопируй их и вставь в поле Координаты.<br><br><b>Теперь Магия Пути будет работать идеально!</b></div>`;
+            cont.innerHTML = `<div class="card"><h3>Совет по расчету:</h3>Чтобы "Магия пути" работала точно, вставляйте координаты из карт. Тогда программа рассчитает маршрут по метрам, а не просто по городам. Сначала будут ближайшие к Ашкелону клиенты.</div>`;
         }
     }
 
     function lookupGPS() {
-        const addr = document.getElementById('f-addr').value;
-        const city = document.getElementById('f-city').value;
-        if(!addr) return alert("Сначала введи адрес!");
-        window.open(`https://www.google.com/maps/search/${encodeURIComponent(addr + ' ' + city)}`, '_blank');
+        const a = document.getElementById('f-addr').value, c = document.getElementById('f-city').value;
+        if(!a) return alert("Введите адрес!");
+        window.open(`https://www.google.com/maps/search/${encodeURIComponent(a + ' ' + c)}`, '_blank');
     }
 
+    // ЛОГИКА РАСЧЕТА МАРШРУТА
     function optimizeRoute() {
-        if (tasks.length < 2) return alert("Нужно больше точек!");
-        let currentPos = { lat: 31.6688, lon: 34.5743 }; // Ашкелон
-        let unvisited = [...tasks], optimized = [];
+        if (tasks.length < 2) return alert("Мало точек для расчета!");
+        
+        let startPos = { lat: 31.6688, lon: 34.5743 }; // Ашкелон
+        let unvisited = [...tasks];
+        let optimized = [];
 
+        // 1. Сначала сортируем тех, у кого есть координаты
         while (unvisited.length > 0) {
-            let closestIdx = 0, minDist = Infinity;
+            let closestIdx = -1;
+            let minDist = Infinity;
+
             unvisited.forEach((task, idx) => {
-                if(task.gps) {
-                    let c = task.gps.split(',').map(Number);
-                    let d = Math.sqrt(Math.pow(c[0]-currentPos.lat,2)+Math.pow(c[1]-currentPos.lon,2));
-                    if(d < minDist) { minDist = d; closestIdx = idx; }
+                if (task.gps) {
+                    let coords = task.gps.split(',').map(Number);
+                    let d = Math.sqrt(Math.pow(coords[0] - startPos.lat, 2) + Math.pow(coords[1] - startPos.lon, 2));
+                    if (d < minDist) { minDist = d; closestIdx = idx; }
                 }
             });
-            let next = unvisited.splice(closestIdx, 1)[0];
-            optimized.push(next);
-            if(next.gps) { let c = next.gps.split(',').map(Number); currentPos = { lat: c[0], lon: c[1] }; }
+
+            // Если нашли точку с GPS
+            if (closestIdx !== -1) {
+                let next = unvisited.splice(closestIdx, 1)[0];
+                optimized.push(next);
+                let coords = next.gps.split(',').map(Number);
+                startPos = { lat: coords[0], lon: coords[1] };
+            } else {
+                // Если у оставшихся нет GPS, просто сортируем по городам (Ашкелон -> Ашдод -> Остальные)
+                const priority = {"Ашкелон": 1, "Ашдод": 2, "Кирьят-Гат": 3, "Другой": 4};
+                unvisited.sort((a, b) => (priority[a.city] || 9) - (priority[b.city] || 9));
+                optimized = [...optimized, ...unvisited];
+                unvisited = [];
+            }
         }
+
         tasks = optimized;
-        localStorage.setItem('tk_v6', JSON.stringify(tasks));
+        localStorage.setItem('exp_v18_tk', JSON.stringify(tasks));
         render();
+        alert("Маршрут пересчитан!");
+    }
+
+    function moveTask(idx, dir) {
+        let nIdx = idx + dir;
+        if(nIdx >= 0 && nIdx < tasks.length) {
+            [tasks[idx], tasks[nIdx]] = [tasks[nIdx], tasks[idx]];
+            localStorage.setItem('exp_v18_tk', JSON.stringify(tasks)); render();
+        }
     }
 
     function clickPlus() {
         if(activeTab === 'clients') {
-            document.getElementById('modal-title').innerText = "Новое Имя";
+            document.getElementById('modal-title').innerText = "Новый клиент";
             document.getElementById('f-idx').value = "-1";
-            document.getElementById('f-name').value = ""; document.getElementById('f-addr').value = ""; document.getElementById('f-gps').value = "";
+            document.getElementById('f-name').value = ""; document.getElementById('f-addr').value = ""; document.getElementById('f-gps').value = ""; document.getElementById('f-phone').value = "";
             document.getElementById('win-client').style.display = 'block';
         } else {
-            document.getElementById('f-select').innerHTML = clients.map((c, i) => `<option value="${i}">${c.name} (${c.city})</option>`).join('');
+            updateModalList();
             document.getElementById('win-order').style.display = 'block';
         }
     }
 
+    function updateModalList() {
+        const sel = document.getElementById('order-city-selector');
+        sel.innerHTML = citiesList.map(c => `<button onclick="modalCity='${c}';updateModalList();" style="border:none; padding:10px; border-radius:8px; background:${modalCity===c?'var(--primary)':'#2C2C2E'}; color:white; font-size:0.7rem;">${c}</button>`).join('');
+        const filtered = clients.filter(c => c.city === modalCity);
+        document.getElementById('f-select').innerHTML = filtered.map(c => `<option value="${clients.indexOf(c)}">${c.name}</option>`).join('');
+    }
+
     function saveClient() {
         const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, p = document.getElementById('f-phone').value, c = document.getElementById('f-city').value, g = document.getElementById('f-gps').value.replace(/\s/g, ''), i = parseInt(document.getElementById('f-idx').value);
-        if(!n || !a) return alert("Заполни данные!");
+        if(!n || !a) return;
         let obj = {name:n, addr:a, phone:p, city:c, gps:g};
         if(i > -1) clients[i] = obj; else clients.push(obj);
-        localStorage.setItem('exp_v6', JSON.stringify(clients));
+        localStorage.setItem('exp_v18_cl', JSON.stringify(clients));
         closeModal(); render();
     }
 
@@ -169,7 +214,7 @@
         const idx = document.getElementById('f-select').value; if(idx==="") return;
         const c = clients[idx];
         tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone, gps: c.gps});
-        localStorage.setItem('tk_v6', JSON.stringify(tasks));
+        localStorage.setItem('exp_v18_tk', JSON.stringify(tasks));
         closeModal(); render();
     }
 
@@ -181,10 +226,10 @@
         document.getElementById('win-client').style.display = 'block';
     }
 
-    function removeTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v6', JSON.stringify(tasks)); render(); }
+    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('exp_v18_tk', JSON.stringify(tasks)); render(); }
     function complete(id) { 
         let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); 
-        localStorage.setItem('tk_v6', JSON.stringify(tasks)); localStorage.setItem('ar_v6', JSON.stringify(archive)); render(); 
+        localStorage.setItem('exp_v18_tk', JSON.stringify(tasks)); localStorage.setItem('exp_v18_ar', JSON.stringify(archive)); render(); 
     }
     function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
     render();
