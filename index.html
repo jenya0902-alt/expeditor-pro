@@ -234,4 +234,240 @@
     showSection('tasks');
 </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Экспедитор Pro v14.2</title>
+    <style>
+        :root { 
+            --primary: #007AFF; --waze: #33CCFF; --bg: #000; --card-bg: #1C1C1E; 
+            --success: #32D74B; --danger: #FF453A; --text: #FFF; --gray: #8E8E93; --border: #38383A;
+            --walking: #A2845E;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, system-ui, sans-serif; }
+        body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: env(safe-area-inset-bottom); min-height: 100vh; display: flex; flex-direction: column; }
+
+        header { 
+            background: rgba(21, 21, 21, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 55px 20px 15px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000; border-bottom: 0.5px solid var(--border);
+        }
+
+        .tabs { display: flex; background: #1C1C1E; margin: 15px 20px; border-radius: 10px; padding: 2px; gap: 2px; }
+        .tab-btn { flex: 1; border: none; background: none; padding: 12px 0; font-weight: 600; color: var(--gray); font-size: 0.85rem; border-radius: 8px; }
+        .tab-btn.active { background: #3A3A3C; color: white; }
+
+        .container { padding: 0 20px 120px 20px; flex: 1; }
+        .btn-main-route { background: var(--primary); color: white; width: 100%; padding: 16px; border-radius: 14px; margin-bottom: 20px; font-weight: 700; border: none; font-size: 1rem; }
+
+        .card { background: var(--card-bg); border-radius: 16px; margin-bottom: 16px; padding: 16px; border: 0.5px solid var(--border); }
+        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .btn-nav { border-radius: 10px; padding: 12px 5px; font-weight: 700; text-align: center; cursor: pointer; text-decoration: none; font-size: 0.75rem; border: none; color: white; display: flex; align-items: center; justify-content: center; }
+        .btn-waze { background: var(--waze); color: #000; }
+        .btn-google { background: var(--primary); }
+        .btn-walk { background: var(--walking); grid-column: span 2; padding: 14px; margin-top: 5px; }
+        .btn-call { background: #2C2C2E; grid-column: span 2; margin-bottom: 8px; padding: 14px; }
+
+        .modal { background: #1C1C1E; padding: 30px 25px 50px; border-radius: 20px 20px 0 0; position: fixed; bottom: 0; left: 0; right: 0; display: none; z-index: 2000; box-shadow: 0 -10px 40px rgba(0,0,0,0.8); border-top: 1px solid var(--border); }
+        .fab { position: fixed; bottom: calc(40px + env(safe-area-inset-bottom)); right: 25px; background: var(--primary); color: white; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; z-index: 1500; box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4); border: none; outline: none; }
+        
+        input { width: 100%; padding: 18px; margin-bottom: 15px; border-radius: 12px; background: #2C2C2E; color: white; font-size: 1rem; border: 1px solid var(--border); }
+        select { width: 100%; padding: 18px; margin-bottom: 15px; border-radius: 12px; background: #2C2C2E; color: white; font-size: 1rem; border: 1px solid var(--border); appearance: none; }
+        
+        footer { text-align: center; padding: 20px; color: #38383A; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-weight: 800; font-size: 1rem; letter-spacing: 1px; color: var(--primary);">EXPEDITOR PRO</div>
+    <div style="font-size: 0.7rem; color: var(--gray);">ASHKELON • ASHDOD • GAT</div>
+</header>
+
+<div class="tabs">
+    <button class="tab-btn active" id="tab-tasks" onclick="showSection('tasks')">МАРШРУТ</button>
+    <button class="tab-btn" id="tab-clients" onclick="showSection('clients')">БАЗА</button>
+    <button class="tab-btn" id="tab-archive" onclick="showSection('archive')">АРХИВ</button>
+</div>
+
+<div class="container" id="content"></div>
+
+<button class="fab" id="main-fab" onclick="mainAction()">+</button>
+
+<footer>Author: Jenya Ochakovski</footer>
+
+<div class="modal" id="modal-client">
+    <h3 style="margin-top:0; text-align:center; color: var(--primary);">Новый клиент в базу</h3>
+    <input type="hidden" id="edit-idx" value="-1">
+    <input type="text" id="c-name" placeholder="Имя (например: Магазин 'Мир')">
+    <input type="tel" id="c-phone" placeholder="Номер телефона">
+    <input type="text" id="c-addr" placeholder="Адрес (Город, Улица, Дом)">
+    <button class="btn-nav btn-google" style="width:100%; font-size:1.1rem; padding:18px;" onclick="saveClient()">СОХРАНИТЬ В БАЗУ</button>
+    <button class="btn-nav" style="width:100%; background:none; color:var(--gray); margin-top:15px" onclick="closeModals()">ОТМЕНА</button>
+</div>
+
+<div class="modal" id="modal-order">
+    <h3 style="margin-top:0; text-align:center; color: var(--primary);">Добавить в маршрут</h3>
+    <p style="text-align:center; color: var(--gray); font-size: 0.9rem;">Выберите клиента из вашей базы:</p>
+    <select id="o-client"></select>
+    <button class="btn-nav btn-google" style="width:100%; font-size:1.1rem; padding:18px;" onclick="addOrder()">ДОБАВИТЬ В СПИСОК</button>
+    <button class="btn-nav" style="width:100%; background:none; color:var(--gray); margin-top:15px" onclick="closeModals()">ОТМЕНА</button>
+</div>
+
+<div class="modal" id="modal-act">
+    <h3 id="act-name" style="text-align:center; margin-top:0;"></h3>
+    <button class="btn-nav" style="background:var(--success); color:black; width:100%; padding:22px; margin-bottom:12px; font-size:1.2rem;" onclick="finishOrder()">✅ ДОСТАВЛЕНО</button>
+    <button class="btn-nav" style="background:#2C2C2E; color:var(--danger); width:100%;" onclick="deleteOrder()">УДАЛИТЬ ИЗ СПИСКА</button>
+    <button class="btn-nav" style="background:none; color:var(--gray); width:100%; margin-top:15px" onclick="closeModals()">ЗАКРЫТЬ</button>
+</div>
+
+<script>
+    let currentTab = 'tasks';
+    let tasks = JSON.parse(localStorage.getItem('tasks_v142')) || [];
+    let clients = JSON.parse(localStorage.getItem('clients_v142')) || [];
+    let archive = JSON.parse(localStorage.getItem('archive_v142')) || [];
+    let selId = null;
+
+    // ГЛАВНОЕ ДЕЙСТВИЕ КНОПКИ [+]
+    function mainAction() {
+        if (currentTab === 'clients') {
+            // Если мы в "БАЗЕ" - открываем форму ввода полей
+            document.getElementById('edit-idx').value = "-1";
+            document.getElementById('c-name').value = "";
+            document.getElementById('c-phone').value = "";
+            document.getElementById('c-addr').value = "";
+            document.getElementById('modal-client').style.display = 'block';
+        } else {
+            // Если мы в "МАРШРУТЕ" - открываем список для выбора
+            if (clients.length === 0) {
+                alert("Сначала добавьте хотя бы одного клиента во вкладке БАЗА!");
+                showSection('clients');
+                return;
+            }
+            const select = document.getElementById('o-client');
+            select.innerHTML = clients.map((c,i) => `<option value="${i}">${c.name}</option>`).join('');
+            document.getElementById('modal-order').style.display = 'block';
+        }
+    }
+
+    function showSection(s) {
+        currentTab = s;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + s).classList.add('active');
+        document.getElementById('main-fab').style.display = (s === 'archive') ? 'none' : 'flex';
+        
+        if(s === 'tasks') renderTasks();
+        else if(s === 'clients') renderClients();
+        else renderArchive();
+    }
+
+    function saveClient() {
+        const n = document.getElementById('c-name').value.trim();
+        const a = document.getElementById('c-addr').value.trim();
+        const ph = document.getElementById('c-phone').value.trim();
+        const idx = parseInt(document.getElementById('edit-idx').value);
+
+        if(!n || !a) { alert("Имя и Адрес обязательны для заполнения!"); return; }
+
+        if(idx > -1) clients[idx] = {name:n, addr:a, phone:ph};
+        else clients.push({name:n, addr:a, phone:ph});
+
+        localStorage.setItem('clients_v142', JSON.stringify(clients));
+        closeModals(); renderClients();
+    }
+
+    function addOrder() {
+        const idx = document.getElementById('o-client').value;
+        const c = clients[idx];
+        tasks.push({ id: Date.now(), n: c.name, a: c.addr, ph: c.phone });
+        localStorage.setItem('tasks_v142', JSON.stringify(tasks));
+        closeModals(); renderTasks();
+    }
+
+    function renderClients() {
+        const cont = document.getElementById('content');
+        if(!clients.length) {
+            cont.innerHTML = `
+                <div style="text-align:center; color:var(--gray); margin-top:80px;">
+                    <span style="font-size:3rem">👥</span>
+                    <p>Ваша база клиентов пуста.<br><b>Нажмите на [+] внизу</b>,<br>чтобы появились поля ввода.</p>
+                </div>`;
+            return;
+        }
+        cont.innerHTML = clients.map((c, i) => `
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="flex:1"><b>${c.name}</b><br><small style="color:var(--gray)">${c.addr}</small></div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-nav" style="padding:10px; background:#2C2C2E;" onclick="editCl(${i})">✏️</button>
+                    <button class="btn-nav" style="padding:10px; background:#3d1a1a; color:red" onclick="delCl(${i})">🗑️</button>
+                </div>
+            </div>`).join('');
+    }
+
+    function renderTasks() {
+        const cont = document.getElementById('content');
+        if(!tasks.length) {
+            cont.innerHTML = `
+                <div style="text-align:center; color:var(--gray); margin-top:80px;">
+                    <span style="font-size:3rem">🚚</span>
+                    <p>На сегодня маршрутов нет.<br>Нажмите [+], чтобы добавить клиента<br>из вашей базы в список поездок.</p>
+                </div>`;
+            return;
+        }
+        let html = `<button class="btn-main-route" onclick="openAllGoogle()">ОБЩИЙ ПУТЬ (GOOGLE)</button>`;
+        tasks.forEach((t, i) => {
+            html += `
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <button class="s-btn" onclick="move(${i},-1)">↑ Выше</button>
+                        <button class="s-btn" onclick="move(${i},1)">↓ Ниже</button>
+                    </div>
+                    <div onclick="openAct(${t.id},'${t.n}')">
+                        <span style="font-size:1.2rem; font-weight:700;">${t.n}</span><br>
+                        <span style="color:var(--gray); font-size:0.9rem;">${t.a}</span>
+                    </div>
+                    <div class="nav-grid">
+                        <a href="tel:${t.ph}" class="btn-nav btn-call">📞 ПОЗВОНИТЬ</a>
+                        <a href="waze://?q=${encodeURIComponent(t.a)}&navigate=yes" class="btn-nav btn-waze">WAZE</a>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(t.a)}" class="btn-nav btn-google">GOOGLE</a>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(t.a)}&travelmode=walking" class="btn-nav btn-walk">🚶 ПЕШЕХОДНЫЙ МАРШРУТ</a>
+                    </div>
+                </div>`;
+        });
+        cont.innerHTML = html;
+    }
+
+    function editCl(i) {
+        const c = clients[i];
+        document.getElementById('edit-idx').value = i;
+        document.getElementById('c-name').value = c.name;
+        document.getElementById('c-phone').value = c.phone;
+        document.getElementById('c-addr').value = c.addr;
+        document.getElementById('modal-client').style.display = 'block';
+    }
+
+    function delCl(i) { if(confirm('Удалить клиента из базы навсегда?')) { clients.splice(i,1); localStorage.setItem('clients_v142', JSON.stringify(clients)); renderClients(); } }
+    function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
+    function openAct(id, n) { selId=id; document.getElementById('act-name').innerText=n; document.getElementById('modal-act').style.display='block'; }
+    function finishOrder() { 
+        const o = tasks.find(t=>t.id===selId);
+        o.end = new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+        archive.push(o);
+        tasks = tasks.filter(t=>t.id!==selId);
+        localStorage.setItem('tasks_v142', JSON.stringify(tasks));
+        localStorage.setItem('archive_v142', JSON.stringify(archive));
+        closeModals(); renderTasks();
+    }
+    function deleteOrder() { tasks = tasks.filter(t=>t.id!==selId); localStorage.setItem('tasks_v142', JSON.stringify(tasks)); closeModals(); renderTasks(); }
+    function move(i, d) { if(tasks[i+d]) { [tasks[i], tasks[i+d]] = [tasks[i+d], tasks[i]]; localStorage.setItem('tasks_v142', JSON.stringify(tasks)); renderTasks(); } }
+    function renderArchive() { document.getElementById('content').innerHTML = archive.slice().reverse().map(t => `<div class="card" style="opacity:0.6"><b>${t.n}</b><br><small>${t.end} - ${t.a}</small></div>`).join('') || "<p style='text-align:center; color:var(--gray)'>Архив пуст</p>"; }
+    function openAllGoogle() { let url = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(tasks[tasks.length-1].a) + "&waypoints=" + tasks.slice(0,-1).map(t=>encodeURIComponent(t.a)).join('|'); window.open(url, '_blank'); }
+
+    showSection('tasks');
+</script>
+</body>
 </html>
