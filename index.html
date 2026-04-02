@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Экспедитор Pro | Base v13.4</title>
+    <style>
+        :root { 
+            --primary: #3399ff; --bg: #0b0b0b; --card-bg: #1a1a1a; 
+            --success: #00e676; --warning: #ffea00; --danger: #ff5252; --text: #f0f0f0; 
+            --gray: #b0b0b0; --border: #2c2c2c;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg); margin: 0; direction: rtl; color: var(--text); line-height: 1.4;
+        }
+
+        header { 
+            background: #151515; color: var(--primary); padding: 18px; 
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000;
+        }
+
+        .tabs { 
+            display: flex; background: #151515; margin: 10px; border-radius: 12px; 
+            padding: 4px; border: 1px solid var(--border); position: sticky; top: 60px; z-index: 999;
+        }
+        .tab-btn { 
+            flex: 1; border: none; background: none; padding: 14px 5px; 
+            font-weight: 800; color: var(--gray); cursor: pointer; font-size: 0.9rem;
+            transition: all 0.2s; border-radius: 8px;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .container { padding: 5px 12px 100px 12px; }
+
+        .btn-main-route { 
+            background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); 
+            color: white; width: 100%; padding: 18px; border-radius: 15px; 
+            margin: 10px 0 20px 0; font-weight: 900; border: none; font-size: 1rem;
+        }
+
+        .card { 
+            background: var(--card-bg); border-radius: 20px; margin-bottom: 15px; padding: 20px; 
+            position: relative; border: 1px solid var(--border);
+        }
+        .card.paid { border-right: 8px solid var(--success); }
+        .card.unpaid { border-right: 8px solid var(--warning); }
+        
+        .sort-controls { position: absolute; left: 12px; top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .sort-btn { background: #333; color: white; border: 1px solid #444; border-radius: 8px; width: 38px; height: 42px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+        
+        .client-info { margin-right: 45px; }
+        .client-title { font-size: 1.2rem; font-weight: 900; display: block; margin-bottom: 4px; }
+        .client-addr { color: var(--gray); font-size: 0.9rem; display: block; margin-bottom: 15px; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { border: none; border-radius: 12px; padding: 14px; font-weight: 900; text-align: center; cursor: pointer; text-decoration: none; font-size: 0.9rem; }
+        .btn-waze { background: var(--primary); color: white; }
+        .btn-call { background: #333; color: white; border: 1px solid #444; }
+        .btn-edit { background: #444; color: white; font-size: 0.8rem; padding: 8px; }
+        .btn-delete { background: #3d1a1a; color: var(--danger); font-size: 0.8rem; padding: 8px; }
+
+        .modal { background: #1a1a1a; padding: 25px; border-radius: 25px 25px 0 0; position: fixed; bottom: 0; left: 0; right: 0; border-top: 3px solid var(--primary); display: none; z-index: 2000; }
+        .fab { position: fixed; bottom: 30px; left: 30px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; z-index: 1500; }
+        
+        input, select { width: 100%; padding: 16px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; background: #252525; color: white; font-size: 1rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-weight:900;">ЭКСПЕДИТОР PRO ₪</div>
+    <div id="header-date">--/--/----</div>
+</header>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="showSection('tasks')">МАРШРУТ</button>
+    <button class="tab-btn" onclick="showSection('clients')">БАЗА</button>
+    <button class="tab-btn" onclick="showSection('archive')">АРХИВ</button>
+</div>
+
+<div class="container" id="content"></div>
+<div class="fab" onclick="openClientModal()">+</div>
+
+<div class="modal" id="client-modal">
+    <h3 id="client-modal-title" style="text-align:center; margin-top:0;">Новый клиент</h3>
+    <input type="hidden" id="edit-index" value="-1">
+    <input type="text" id="cl-name" placeholder="Имя клиента">
+    <input type="tel" id="cl-phone" placeholder="Телефон" inputmode="tel">
+    <input type="text" id="cl-address" placeholder="Город, улица, дом">
+    <button id="btn-save-client" class="btn btn-waze" style="width:100%;" onclick="saveClient()">СОХРАНИТЬ</button>
+    <button class="btn" style="background:none; color:gray; width:100%; margin-top:10px;" onclick="closeModals()">ОТМЕНА</button>
+</div>
+
+<div class="modal" id="order-modal">
+    <h3 style="text-align:center; margin-top:0;">В маршрут</h3>
+    <select id="ord-client"></select>
+    <div style="display:flex; gap:10px; margin-bottom:15px; justify-content:center; background: #252525; padding: 10px; border-radius: 12px;">
+        <label><input type="radio" name="pay" value="paid" checked onchange="toggleCashInput()"> 💳 ОК</label>
+        <label><input type="radio" name="pay" value="cash" onchange="toggleCashInput()"> 💵 НАЛ</label>
+    </div>
+    <input type="number" id="ord-amount" placeholder="Сумма ₪" style="display:none;" inputmode="numeric">
+    <button class="btn btn-waze" style="width:100%;" onclick="addOrder()">ДОБАВИТЬ</button>
+    <button class="btn" style="background:none; color:gray; width:100%; margin-top:10px;" onclick="closeModals()">ОТМЕНА</button>
+</div>
+
+<div class="modal" id="action-modal">
+    <h3 id="modal-title" style="text-align:center;">Управление</h3>
+    <button class="btn" style="background:var(--success); color:black; width:100%; padding:20px; margin-bottom:10px;" onclick="completeOrder()">✅ ДОСТАВЛЕНО</button>
+    <button class="btn" style="background:#3d1a1a; color:var(--danger); width:100%;" onclick="removeOrder()">❌ ОТМЕНА</button>
+    <button class="btn" style="background:none; color:gray; width:100%;" onclick="closeModals()">НАЗАД</button>
+</div>
+
+<script>
+    let tasks = JSON.parse(localStorage.getItem('tasks_v13')) || [];
+    let clients = JSON.parse(localStorage.getItem('clients_v13')) || [];
+    let archive = JSON.parse(localStorage.getItem('archive_v13')) || [];
+    let userPos = null;
+    let selectedOrderId = null;
+    let archiveDate = new Date().toISOString().split('T')[0];
+
+    document.getElementById('header-date').innerText = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+    
+    navigator.geolocation.watchPosition(pos => {
+        userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        if(document.querySelector('.tab-btn.active').innerText === 'МАРШРУТ') renderTasks();
+    });
+
+    function showSection(s) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const fab = document.querySelector('.fab');
+        if(s==='tasks') { 
+            document.querySelector('.tab-btn:nth-child(1)').classList.add('active'); 
+            renderTasks(); 
+            fab.onclick = openOrderModal;
+            fab.innerText = "+";
+        } else if(s==='clients') { 
+            document.querySelector('.tab-btn:nth-child(2)').classList.add('active'); 
+            renderClients(); 
+            fab.onclick = openClientModal;
+            fab.innerText = "👤+";
+        } else { 
+            document.querySelector('.tab-btn:nth-child(3)').classList.add('active'); 
+            renderArchive(); 
+        }
+    }
+
+    function renderTasks() {
+        const cont = document.getElementById('content');
+        if(tasks.length === 0) return cont.innerHTML = "<div style='text-align:center; padding:60px; color:gray;'>Маршрут пуст</div>";
+        let html = `<button class="btn-main-route" onclick="openFullGoogleMap()">🗺 ВЕСЬ МАРШРУТ В GOOGLE</button>`;
+        let totalTime = 0;
+        tasks.forEach((t, i) => {
+            if(userPos) {
+                const dLat = (t.lat - userPos.lat) * Math.PI/180;
+                const dLon = (t.lon - userPos.lng) * Math.PI/180;
+                const a = Math.sin(dLat/2)**2 + Math.cos(userPos.lat*Math.PI/180)*Math.cos(t.lat*Math.PI/180)*Math.sin(dLon/2)**2;
+                t.dist = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                totalTime += Math.round((t.dist / 40) * 60 + 5);
+            }
+            html += `
+                <div class="card ${t.payStatus==='cash' && !t.moneyReceived ? 'unpaid' : 'paid'}">
+                    <div class="sort-controls">
+                        <button class="sort-btn" onclick="moveTask(${i}, 'up')">↑</button>
+                        <button class="sort-btn" onclick="moveTask(${i}, 'down')">↓</button>
+                    </div>
+                    <div class="client-info" onclick="openActionMenu(${t.id}, '${t.clientName}')">
+                        <small style="color:var(--success); font-weight:bold;">⏱ ~${totalTime} мин</small><br>
+                        <span class="client-title">${t.clientName}</span>
+                        <span class="client-addr">${t.addr}</span>
+                        <div class="btn-group" onclick="event.stopPropagation()">
+                            <a href="tel:${t.phone}" class="btn btn-call">📞 Звонок</a>
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(t.addr)}" class="btn btn-waze">📍 Карта</a>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        cont.innerHTML = html;
+    }
+
+    function renderClients() {
+        const cont = document.getElementById('content');
+        cont.innerHTML = clients.map((c, i) => `
+            <div class="card" style="padding:15px;">
+                <div style="display:flex; justify-content:space-between; align-items:start;">
+                    <div>
+                        <b style="font-size:1.1rem;">${c.name}</b><br>
+                        <small style="color:gray;">${c.phone}</small><br>
+                        <small style="color:var(--primary);">${c.addr}</small>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:5px;">
+                        <button class="btn btn-edit" onclick="editClient(${i})">✏️</button>
+                        <button class="btn btn-delete" onclick="deleteClient(${i})">🗑️</button>
+                    </div>
+                </div>
+            </div>`).join('') || "<div style='text-align:center; padding:60px; color:gray;'>База пуста</div>";
+    }
+
+    async function saveClient() {
+        const name = document.getElementById('cl-name').value;
+        const phone = document.getElementById('cl-phone').value;
+        const addr = document.getElementById('cl-address').value;
+        const idx = parseInt(document.getElementById('edit-index').value);
+        const btn = document.getElementById('btn-save-client');
+
+        if (!name || !addr) return alert("Имя и адрес обязательны!");
+        btn.innerText = "ПОИСК..."; btn.disabled = true;
+
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}`);
+            const data = await res.json();
+            if(data && data.length > 0) {
+                const clientObj = { name, phone, addr, lat: data[0].lat, lon: data[0].lon };
+                if (idx > -1) clients[idx] = clientObj;
+                else clients.push(clientObj);
+                localStorage.setItem('clients_v13', JSON.stringify(clients));
+                closeModals(); renderClients();
+            } else { alert("Адрес не найден!"); }
+        } catch (e) { alert("Ошибка!"); }
+        btn.innerText = "СОХРАНИТЬ"; btn.disabled = false;
+    }
+
+    function editClient(i) {
+        const c = clients[i];
+        document.getElementById('edit-index').value = i;
+        document.getElementById('cl-name').value = c.name;
+        document.getElementById('cl-phone').value = c.phone;
+        document.getElementById('cl-address').value = c.addr;
+        document.getElementById('client-modal-title').innerText = "Изменить клиента";
+        document.getElementById('client-modal').style.display = 'block';
+    }
+
+    function deleteClient(i) {
+        if(confirm(`Удалить клиента ${clients[i].name}?`)) {
+            clients.splice(i, 1);
+            localStorage.setItem('clients_v13', JSON.stringify(clients));
+            renderClients();
+        }
+    }
+
+    function openClientModal() {
+        document.getElementById('edit-index').value = "-1";
+        document.querySelectorAll('#client-modal input').forEach(inp => inp.value = "");
+        document.getElementById('client-modal-title').innerText = "Новый клиент";
+        document.getElementById('client-modal').style.display = 'block';
+    }
+
+    function openOrderModal() {
+        document.getElementById('order-modal').style.display = 'block';
+        document.getElementById('ord-client').innerHTML = '<option value="">-- Выбрать клиента --</option>' + 
+            clients.map((c,i) => `<option value="${i}">${c.name}</option>`).join('');
+    }
+
+    function addOrder() {
+        const idx = document.getElementById('ord-client').value;
+        if (!idx) return;
+        const c = clients[idx];
+        tasks.push({ 
+            id: Date.now(), clientName: c.name, phone: c.phone, addr: c.addr, lat: c.lat, lon: c.lon,
+            payStatus: document.querySelector('input[name="pay"]:checked').value,
+            amount: document.getElementById('ord-amount').value || 0,
+            startTime: new Date().toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'}),
+            moneyReceived: false 
+        });
+        localStorage.setItem('tasks_v13', JSON.stringify(tasks));
+        closeModals(); renderTasks();
+    }
+
+    function renderArchive() {
+        const filtered = archive.filter(a => a.finishDate === archiveDate);
+        const total = filtered.reduce((sum, a) => sum + (a.payStatus === 'cash' ? Number(a.amount || 0) : 0), 0);
+        document.getElementById('content').innerHTML = `
+            <input type="date" value="${archiveDate}" onchange="archiveDate=this.value; renderArchive()" style="margin-bottom:15px;">
+            <div style="background:var(--success); padding:20px; border-radius:15px; text-align:center; color:black; font-weight:900; margin-bottom:15px;">НАЛИЧНЫЕ: ${total} ₪</div>
+            ${filtered.slice().reverse().map(t => `<div class="card" style="opacity:0.7; padding:15px;">${t.startTime} → ${t.finishTimeOnly}<br><b>${t.clientName}</b></div>`).join('')}`;
+    }
+
+    function openFullGoogleMap() {
+        let url = "https://www.google.com/maps/dir/";
+        if (userPos) url += userPos.lat + "," + userPos.lng + "/";
+        url += tasks.map(t => encodeURIComponent(t.addr)).join('/');
+        window.open(url, '_blank');
+    }
+
+    function toggleCashInput() { document.getElementById('ord-amount').style.display = document.querySelector('input[name="pay"]:checked').value === 'cash' ? 'block' : 'none'; }
+    function openActionMenu(id, name) { selectedOrderId=id; document.getElementById('modal-title').innerText=name; document.getElementById('action-modal').style.display='block'; }
+    function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
+    function moveTask(idx, dir) { if(dir==='up' && idx>0) [tasks[idx], tasks[idx-1]] = [tasks[idx-1], tasks[idx]]; else if(dir==='down' && idx<tasks.length-1) [tasks[idx], tasks[idx+1]] = [tasks[idx+1], tasks[idx]]; localStorage.setItem('tasks_v13', JSON.stringify(tasks)); renderTasks(); }
+    function completeOrder() { const order=tasks.find(t=>t.id===selectedOrderId); const now=new Date(); order.finishDate=now.toISOString().split('T')[0]; order.finishTimeOnly=now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}); archive.push(order); tasks=tasks.filter(t=>t.id!==selectedOrderId); localStorage.setItem('tasks_v13', JSON.stringify(tasks)); localStorage.setItem('archive_v13', JSON.stringify(archive)); closeModals(); renderTasks(); }
+    function removeOrder() { tasks=tasks.filter(t=>t.id!==selectedOrderId); localStorage.setItem('tasks_v13', JSON.stringify(tasks)); closeModals(); renderTasks(); }
+
+    showSection('tasks');
+</script>
+</body>
+</html>
