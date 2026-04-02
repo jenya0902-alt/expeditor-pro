@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Expeditor GPS v18.4</title>
+    <title>Expeditor Pro v18.6</title>
     <style>
-        :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --success: #32D74B; --waze: #33CCFF; }
+        :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --success: #32D74B; --waze: #33CCFF; --magic: linear-gradient(45deg, #FF375F, #BF5AF2); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
         body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: 100px; padding-top: env(safe-area-inset-top); overflow-x: hidden; }
         
         header { padding: 15px 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .magic-btn { background: linear-gradient(45deg, #FF375F, #BF5AF2); color: white; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 0.7rem; border: none; box-shadow: 0 0 10px rgba(191,90,242,0.4); }
+        .magic-btn { background: var(--magic); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 0.7rem; border: none; box-shadow: 0 4px 15px rgba(191,90,242,0.3); }
         
         .tabs { display: flex; background: #1C1C1E; margin: 15px; border-radius: 14px; padding: 3px; border: 0.5px solid var(--border); }
         .tab-btn { flex: 1; border: none; background: none; padding: 12px; color: var(--gray); font-weight: 600; border-radius: 11px; font-size: 0.65rem; }
@@ -20,12 +20,15 @@
         .card { background: var(--card-bg); border-radius: 22px; margin-bottom: 12px; padding: 18px; border: 0.5px solid var(--border); }
         
         .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-n { border-radius: 14px; padding: 16px; text-decoration: none; font-size: 0.75rem; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; border: none; }
+        .btn-n { border-radius: 14px; padding: 16px; text-decoration: none; font-size: 0.75rem; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; border: none; text-align: center; }
         .b-waze { background: var(--waze); color: #000; }
-        .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 5px; }
+        .b-call { background: #2C2C2E; border: 0.5px solid var(--border); }
+        .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 8px; }
 
-        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px; border-radius: 25px 25px 0 0; z-index: 3000; border-top: 1px solid var(--border); max-height: 85vh; overflow-y: auto; }
-        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 0.9rem; }
+        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px 20px 40px; border-radius: 25px 25px 0 0; z-index: 3000; border-top: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
+        input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; }
+        
+        .find-gps { background: #5856D6; color: white; padding: 10px; border-radius: 10px; border: none; width: 100%; margin-bottom: 15px; font-weight: 700; font-size: 0.8rem; }
         
         .fab { position: fixed; bottom: 30px; right: 20px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; border: none; z-index: 1500; }
         .hebrew { direction: rtl; text-align: right; }
@@ -34,15 +37,16 @@
 <body>
 
 <header>
-    <button class="magic-btn" onclick="optimizeRoute()">✨ МАГИЯ (МАРШРУТ)</button>
-    <div style="font-weight:900;">EXPEDITOR GPS</div>
-    <div style="width: 30px;"></div>
+    <button class="magic-btn" onclick="optimizeRoute()">✨ МАГИЯ ПУТИ</button>
+    <div style="font-weight:900;">EXPEDITOR</div>
+    <div style="width: 20px;"></div>
 </header>
 
 <div class="tabs">
     <button id="t-tasks" class="tab-btn active" onclick="setTab('tasks')">МАРШРУТ</button>
     <button id="t-clients" class="tab-btn" onclick="setTab('clients')">БАЗА</button>
     <button id="t-archive" class="tab-btn" onclick="setTab('archive')">АРХИВ</button>
+    <button id="t-help" class="tab-btn" onclick="setTab('help')">ПОМОЩЬ</button>
 </div>
 
 <main id="main-content" class="container"></main>
@@ -50,29 +54,33 @@
 <button class="fab" onclick="clickPlus()">+</button>
 
 <div id="win-client" class="modal">
-    <h3 style="text-align:center;" id="modal-title">Новое Имя</h3>
+    <h3 style="text-align:center;" id="modal-title">Карточка</h3>
     <input type="hidden" id="f-idx" value="-1">
     <select id="f-city"><option>Ашкелон</option><option>Ашдод</option><option>Кирьят-Гат</option><option>Другой</option></select>
     <input type="text" id="f-name" placeholder="Имя">
     <input type="tel" id="f-phone" placeholder="Телефон">
-    <input type="text" id="f-addr" class="hebrew" placeholder="Адрес (иврит)">
-    <input type="text" id="f-gps" placeholder="Координаты (31.66, 34.57)">
-    <button class="btn-n" style="width:100%; background:var(--primary);" onclick="saveClient()">СОХРАНИТЬ</button>
+    <input type="text" id="f-addr" id="addr-field" class="hebrew" placeholder="Адрес (иврит)">
+    
+    <button class="find-gps" onclick="lookupGPS()">🔍 НАЙТИ КООРДИНАТЫ</button>
+    
+    <input type="text" id="f-gps" placeholder="Вставь сюда (например: 31.6, 34.5)">
+    
+    <button class="btn-n" style="width:100%; background:var(--primary);" onclick="saveClient()">СОХРАНИТЬ В БАЗУ</button>
     <button class="btn-n" style="width:100%; background:none; color:var(--gray);" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <div id="win-order" class="modal">
     <h3 style="text-align:center;">Добавить в план</h3>
-    <select id="f-select" size="8" style="background:#000;"></select>
+    <select id="f-select" size="10" style="background:#000;"></select>
     <button class="btn-n" style="width:100%; background:var(--primary);" onclick="addTask()">В МАРШРУТ</button>
     <button class="btn-n" style="width:100%; background:none; color:var(--gray);" onclick="closeModal()">ЗАКРЫТЬ</button>
 </div>
 
 <script>
     let activeTab = 'tasks';
-    let clients = JSON.parse(localStorage.getItem('gps_cl')) || [];
-    let tasks = JSON.parse(localStorage.getItem('gps_tk')) || [];
-    let archive = JSON.parse(localStorage.getItem('gps_ar')) || [];
+    let clients = JSON.parse(localStorage.getItem('exp_v6')) || [];
+    let tasks = JSON.parse(localStorage.getItem('tk_v6')) || [];
+    let archive = JSON.parse(localStorage.getItem('ar_v6')) || [];
 
     function setTab(t) { activeTab = t; render(); }
 
@@ -82,85 +90,58 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-'+activeTab));
 
         if (activeTab === 'tasks') {
-            if(!tasks.length) cont.innerHTML = '<p style="text-align:center; color:gray; margin-top:50px;">Маршрут пуст. Нажми +</p>';
+            if(!tasks.length) cont.innerHTML = '<div style="text-align:center; color:gray; margin-top:50px;">Маршрут пуст. Жми +</div>';
             cont.innerHTML += tasks.map((t, i) => `
                 <div class="card">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <span>#${i+1} 📍</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="color:var(--primary); font-weight:800;">#${i+1} ${t.gps ? '📍' : '🏠'}</span>
                         <button onclick="removeTask(${t.id})" style="background:none; border:none; color:red;">✕</button>
                     </div>
-                    <b>${t.n}</b>
-                    <div class="hebrew" style="color:gray; font-size:0.85rem; margin:5px 0;">${t.a}</div>
+                    <b style="font-size:1.2rem;">${t.n}</b>
+                    <div class="hebrew" style="color:var(--gray); margin:5px 0;">${t.a} (${t.city})</div>
                     <div class="nav-grid">
-                        <a href="tel:${t.ph}" class="btn-n" style="background:#2C2C2E;">📞 ЗВОНОК</a>
-                        <a href="https://waze.com/ul?ll=${t.gps || '0,0'}&navigate=yes" class="btn-n b-waze">🚗 WAZE</a>
-                        <button class="btn-n b-done" onclick="complete(${t.id})">✅ РАЗГРУЗИЛАСЬ</button>
+                        <a href="tel:${t.ph}" class="btn-n b-call">📞 СВЯЗЬ</a>
+                        <a href="https://waze.com/ul?${t.gps ? 'll='+t.gps : 'q='+encodeURIComponent(t.a+' '+t.city)}&navigate=yes" class="btn-n b-waze">🚗 WAZE</a>
+                        <button class="btn-n b-done" onclick="complete(${t.id})">✅ ГОТОВО</button>
                     </div>
                 </div>`).join('');
         } else if (activeTab === 'clients') {
-            cont.innerHTML = clients.map((c, i) => `
-                <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                    <div><b>${c.name}</b><br><small>${c.gps ? '📍 Есть GPS' : '❌ Нет координат'}</small></div>
-                    <button onclick="edit(${i})" style="background:#2C2C2E; border:none; padding:10px; border-radius:10px;">✏️</button>
-                </div>`).join('');
+            cont.innerHTML = clients.map((c, i) => `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><div><b>${c.name}</b><br><small>${c.city}</small></div><button onclick="edit(${i})" style="background:#2C2C2E; border:none; padding:10px; border-radius:10px;">✏️</button></div>`).join('');
+        } else if (activeTab === 'archive') {
+            cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.5;"><b>${a.n}</b></div>`).join('');
+        } else if (activeTab === 'help') {
+            cont.innerHTML = `<div class="card"><h3>Инструкция GPS:</h3>1. Введи адрес на иврите.<br>2. Нажми <b>Найти координаты</b>.<br>3. В Картах зажми пальцем точку, пока не появятся цифры.<br>4. Скопируй их и вставь в поле Координаты.<br><br><b>Теперь Магия Пути будет работать идеально!</b></div>`;
         }
     }
 
-    // МАГИЯ: Сортировка по ближайшему соседу
+    function lookupGPS() {
+        const addr = document.getElementById('f-addr').value;
+        const city = document.getElementById('f-city').value;
+        if(!addr) return alert("Сначала введи адрес!");
+        window.open(`https://www.google.com/maps/search/${encodeURIComponent(addr + ' ' + city)}`, '_blank');
+    }
+
     function optimizeRoute() {
-        if (tasks.length < 2) return;
-        
-        let currentPos = { lat: 31.6688, lon: 34.5743 }; // Старт: Ашкелон
-        let unvisited = [...tasks];
-        let optimized = [];
+        if (tasks.length < 2) return alert("Нужно больше точек!");
+        let currentPos = { lat: 31.6688, lon: 34.5743 }; // Ашкелон
+        let unvisited = [...tasks], optimized = [];
 
         while (unvisited.length > 0) {
-            let closestIdx = -1;
-            let minDist = Infinity;
-
+            let closestIdx = 0, minDist = Infinity;
             unvisited.forEach((task, idx) => {
                 if(task.gps) {
-                    let coords = task.gps.split(',').map(Number);
-                    let dist = Math.sqrt(Math.pow(coords[0] - currentPos.lat, 2) + Math.pow(coords[1] - currentPos.lon, 2));
-                    if(dist < minDist) { minDist = dist; closestIdx = idx; }
+                    let c = task.gps.split(',').map(Number);
+                    let d = Math.sqrt(Math.pow(c[0]-currentPos.lat,2)+Math.pow(c[1]-currentPos.lon,2));
+                    if(d < minDist) { minDist = d; closestIdx = idx; }
                 }
             });
-
-            if(closestIdx === -1) closestIdx = 0; // Если GPS нет, берем просто следующего
-
-            let nextTask = unvisited.splice(closestIdx, 1)[0];
-            optimized.push(nextTask);
-            
-            if(nextTask.gps) {
-                let coords = nextTask.gps.split(',').map(Number);
-                currentPos = { lat: coords[0], lon: coords[1] };
-            }
+            let next = unvisited.splice(closestIdx, 1)[0];
+            optimized.push(next);
+            if(next.gps) { let c = next.gps.split(',').map(Number); currentPos = { lat: c[0], lon: c[1] }; }
         }
-
         tasks = optimized;
-        localStorage.setItem('gps_tk', JSON.stringify(tasks));
+        localStorage.setItem('tk_v6', JSON.stringify(tasks));
         render();
-        alert("Маршрут перестроен по кратчайшему пути!");
-    }
-
-    function saveClient() {
-        const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, 
-              p = document.getElementById('f-phone').value, c = document.getElementById('f-city').value, 
-              g = document.getElementById('f-gps').value.replace(/\s/g, ''), i = parseInt(document.getElementById('f-idx').value);
-        if(!n || !a) return;
-        let obj = {name:n, addr:a, phone:p, city:c, gps:g};
-        if(i > -1) clients[i] = obj; else clients.push(obj);
-        localStorage.setItem('gps_cl', JSON.stringify(clients));
-        closeModal(); render();
-    }
-
-    function addTask() {
-        const val = document.getElementById('f-select').value;
-        if(val === "") return;
-        const c = clients[val];
-        tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone, gps: c.gps});
-        localStorage.setItem('gps_tk', JSON.stringify(tasks));
-        closeModal(); render();
     }
 
     function clickPlus() {
@@ -175,26 +156,37 @@
         }
     }
 
+    function saveClient() {
+        const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, p = document.getElementById('f-phone').value, c = document.getElementById('f-city').value, g = document.getElementById('f-gps').value.replace(/\s/g, ''), i = parseInt(document.getElementById('f-idx').value);
+        if(!n || !a) return alert("Заполни данные!");
+        let obj = {name:n, addr:a, phone:p, city:c, gps:g};
+        if(i > -1) clients[i] = obj; else clients.push(obj);
+        localStorage.setItem('exp_v6', JSON.stringify(clients));
+        closeModal(); render();
+    }
+
+    function addTask() {
+        const idx = document.getElementById('f-select').value; if(idx==="") return;
+        const c = clients[idx];
+        tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone, gps: c.gps});
+        localStorage.setItem('tk_v6', JSON.stringify(tasks));
+        closeModal(); render();
+    }
+
     function edit(i) {
         const c = clients[i];
         document.getElementById('modal-title').innerText = "Изменить";
         document.getElementById('f-idx').value = i;
-        document.getElementById('f-name').value = c.name;
-        document.getElementById('f-addr').value = c.addr;
-        document.getElementById('f-phone').value = c.phone;
-        document.getElementById('f-city').value = c.city;
-        document.getElementById('f-gps').value = c.gps || "";
+        document.getElementById('f-name').value = c.name; document.getElementById('f-addr').value = c.addr; document.getElementById('f-phone').value = c.phone; document.getElementById('f-city').value = c.city; document.getElementById('f-gps').value = c.gps || "";
         document.getElementById('win-client').style.display = 'block';
     }
 
-    function removeTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('gps_tk', JSON.stringify(tasks)); render(); }
+    function removeTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v6', JSON.stringify(tasks)); render(); }
     function complete(id) { 
-        let t = tasks.find(x => x.id === id); 
-        archive.push(t); tasks = tasks.filter(x => x.id !== id); 
-        localStorage.setItem('gps_tk', JSON.stringify(tasks)); localStorage.setItem('gps_ar', JSON.stringify(archive)); render(); 
+        let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); 
+        localStorage.setItem('tk_v6', JSON.stringify(tasks)); localStorage.setItem('ar_v6', JSON.stringify(archive)); render(); 
     }
     function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
-
     render();
 </script>
 </body>
