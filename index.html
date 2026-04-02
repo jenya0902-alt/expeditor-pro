@@ -4,43 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Экспедитор Pro v14.6</title>
+    <title>Expeditor Elite v14.8</title>
     <style>
-        :root { --primary: #007AFF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --danger: #FF453A; --success: #32D74B; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: 100px; }
+        :root { 
+            --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; 
+            --text: #FFF; --gray: #8E8E93; --border: #38383A; 
+            --danger: #FF453A; --success: #32D74B; --waze: #33CCFF;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
-        header { padding: 50px 20px 15px; background: #151515; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .sos-btn { background: var(--danger); color: white; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 0.75rem; border: none; }
-        .help-btn { background: #3A3A3C; color: white; width: 32px; height: 32px; border-radius: 50%; border: none; font-weight: bold; font-size: 1.1rem; }
+        body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: 120px; overflow-x: hidden; }
         
-        .tabs { display: flex; background: #1C1C1E; margin: 15px 20px; border-radius: 10px; padding: 2px; }
-        .tab-btn { flex: 1; border: none; background: none; padding: 12px; color: var(--gray); font-weight: 600; border-radius: 8px; font-size: 0.8rem; }
-        .tab-btn.active { background: #3A3A3C; color: white; }
+        /* Glassmorphism Header */
+        header { 
+            padding: 55px 20px 15px; 
+            background: rgba(21, 21, 21, 0.7); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 0.5px solid var(--border); 
+            display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 1000; 
+        }
 
-        .container { padding: 0 20px; }
-        .city-divider { color: var(--primary); font-size: 0.75rem; font-weight: 800; margin: 20px 0 10px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        .card { background: var(--card-bg); border-radius: 16px; margin-bottom: 12px; padding: 16px; border: 0.5px solid var(--border); }
+        .sos-btn { background: linear-gradient(180deg, #FF453A 0%, #D70015 100%); color: white; padding: 10px 16px; border-radius: 12px; font-weight: 800; font-size: 0.7rem; border: none; box-shadow: 0 4px 12px rgba(255, 69, 58, 0.3); }
+        .help-btn { background: #3A3A3C; color: white; width: 36px; height: 36px; border-radius: 50%; border: none; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+
+        /* Modern Tabs */
+        .tabs { display: flex; background: #1C1C1E; margin: 20px; border-radius: 14px; padding: 3px; border: 0.5px solid var(--border); }
+        .tab-btn { flex: 1; border: none; background: none; padding: 12px; color: var(--gray); font-weight: 600; border-radius: 11px; font-size: 0.75rem; transition: all 0.2s ease; }
+        .tab-btn.active { background: #3A3A3C; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+
+        /* Filter Chips */
+        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 15px; scrollbar-width: none; }
+        .f-chip { background: #1C1C1E; color: var(--gray); padding: 8px 18px; border-radius: 20px; font-size: 0.75rem; border: 0.5px solid var(--border); white-space: nowrap; font-weight: 600; transition: 0.3s; }
+        .f-chip.active { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+
+        .container { padding: 0 20px; animation: fadeInUp 0.4s ease-out; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .city-divider { color: var(--primary); font-size: 0.65rem; font-weight: 800; margin: 25px 0 12px; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
+        .city-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+        /* Elegant Cards */
+        .card { 
+            background: linear-gradient(145deg, #1c1c1e 0%, #161618 100%); 
+            border-radius: 22px; margin-bottom: 16px; padding: 20px; 
+            border: 0.5px solid var(--border); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-n { border-radius: 14px; padding: 14px; text-align: center; text-decoration: none; font-size: 0.75rem; font-weight: 700; color: white; border: none; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
+        .btn-n:active { opacity: 0.7; }
         
-        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .btn-n { border-radius: 10px; padding: 12px; text-align: center; text-decoration: none; font-size: 0.8rem; font-weight: 700; color: white; border: none; display: flex; align-items: center; justify-content: center; }
-        .b-waze { background: #33CCFF; color: #000; }
+        .b-waze { background: var(--waze); color: #000; }
         .b-go { background: var(--primary); }
         .b-walk { background: #A2845E; grid-column: span 2; }
-        .b-call { background: #2C2C2E; grid-column: span 2; margin-bottom: 5px; }
+        .b-call { background: #2C2C2E; grid-column: span 2; margin-bottom: 8px; border: 0.5px solid var(--border); }
+        .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 12px; font-size: 0.85rem; padding: 18px; }
 
-        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 30px 20px 60px; border-radius: 25px 25px 0 0; z-index: 2000; border-top: 1px solid var(--border); box-shadow: 0 -10px 30px rgba(0,0,0,0.9); }
-        input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; }
-        
-        .fab { position: fixed; bottom: 35px; right: 25px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; border: none; z-index: 1500; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        footer { text-align: center; color: #38383A; font-size: 0.65rem; margin: 30px 0; letter-spacing: 1px; }
+        /* Modals */
+        .modal { 
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; 
+            background: #1C1C1E; padding: 35px 25px 60px; 
+            border-radius: 30px 30px 0 0; z-index: 2000; 
+            border-top: 0.5px solid var(--border); 
+            box-shadow: 0 -15px 40px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        input, select { width: 100%; padding: 18px; margin-bottom: 14px; border-radius: 16px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--primary); }
+
+        .fab { 
+            position: fixed; bottom: 35px; right: 25px; 
+            background: linear-gradient(135deg, #0A84FF 0%, #0040DD 100%); 
+            color: white; width: 68px; height: 68px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 40px; border: none; z-index: 1500; 
+            box-shadow: 0 8px 25px rgba(10, 132, 255, 0.4); 
+        }
+
+        footer { text-align: center; color: #38383A; font-size: 0.6rem; margin: 40px 0; letter-spacing: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <header>
     <button class="sos-btn" onclick="window.open('https://www.google.com/maps/search/bomb+shelter', '_blank')">🛡️ УБЕЖИЩЕ</button>
-    <div style="font-weight: 800; color: var(--primary); font-size: 0.9rem;">EXPEDITOR PRO</div>
+    <div style="font-weight: 900; letter-spacing: -0.5px; font-size: 1.1rem; background: linear-gradient(to right, #FFF, #8E8E93); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Expeditor Elite</div>
     <button class="help-btn" onclick="openModal('win-help')">?</button>
 </header>
 
@@ -50,58 +102,53 @@
     <button class="tab-btn" id="t-archive" onclick="setTab('archive')">АРХИВ</button>
 </div>
 
+<div id="filter-container" class="filter-bar"></div>
+
 <div class="container" id="main-content"></div>
 
 <button class="fab" onclick="clickPlus()">+</button>
 
-<footer>Author: Jenya Ochakovski</footer>
+<footer>Designed by Jenya Ochakovski • v14.8</footer>
 
 <div id="win-help" class="modal">
-    <h2 style="margin-top:0; text-align:center; color: var(--primary);">Справка</h2>
-    <p>1. В <b>Базе</b> добавляй клиентов по городам.</p>
-    <p>2. В <b>Маршруте</b> добавляй их в список кнопкой [+].</p>
-    <p>3. Жми <b>Готово</b>, чтобы убрать в Архив.</p>
-    <button class="btn-n b-go" style="width:100%; margin-top:10px; padding:18px;" onclick="closeModal()">ЗАКРЫТЬ</button>
+    <h2 style="margin-top:0; text-align:center;">Инструкция</h2>
+    <p style="color:var(--gray); line-height:1.6">1. Наполни <b>Базу</b> данными клиентов.<br>2. В <b>Маршруте</b> нажми [+], чтобы добавить клиента из базы в список дел.<br>3. Используй <b>фильтры по городам</b> для быстрой сортировки.</p>
+    <button class="btn-n b-go" style="width:100%; margin-top:20px; padding:20px;" onclick="closeModal()">ПОНЯТНО</button>
 </div>
 
 <div id="win-client" class="modal">
-    <h3 style="margin-top:0; text-align:center;">Новый клиент</h3>
+    <h3 style="margin-top:0; text-align:center;">Новая карточка</h3>
     <input type="hidden" id="f-idx" value="-1">
     <select id="f-city">
-        <option value="Ашкелон">Ашкелон</option>
-        <option value="Ашдод">Ашдод</option>
-        <option value="Кирьят-Гат">Кирьят-Гат</option>
-        <option value="Другой">Другой город</option>
+        <option value="Ашкелон">📍 Ашкелон</option>
+        <option value="Ашдод">📍 Ашдод</option>
+        <option value="Кирьят-Гат">📍 Кирьят-Гат</option>
+        <option value="Другой">📍 Другой город</option>
     </select>
-    <input type="text" id="f-name" placeholder="Имя">
+    <input type="text" id="f-name" placeholder="Наименование (напр. Магазин)">
     <input type="tel" id="f-phone" placeholder="Телефон">
-    <input type="text" id="f-addr" placeholder="Улица и дом">
-    <button class="btn-n b-go" style="width:100%; padding:18px;" onclick="save()">СОХРАНИТЬ</button>
-    <button class="btn-n" style="width:100%; background:none; margin-top:10px; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
+    <input type="text" id="f-addr" placeholder="Улица и номер дома">
+    <button class="btn-n b-go" style="width:100%; padding:20px; font-size:1rem;" onclick="save()">СОХРАНИТЬ В БАЗУ</button>
+    <button class="btn-n" style="width:100%; background:none; margin-top:15px; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <div id="win-order" class="modal">
-    <h3 style="margin-top:0; text-align:center;">В путь</h3>
+    <h3 style="margin-top:0; text-align:center;">В путь!</h3>
+    <p style="text-align:center; color:var(--gray); font-size:0.9rem;">Выберите клиента для доставки:</p>
     <select id="f-select"></select>
-    <button class="btn-n b-go" style="width:100%; padding:18px;" onclick="add()">ДОБАВИТЬ</button>
-    <button class="btn-n" style="width:100%; background:none; margin-top:10px; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
+    <button class="btn-n b-go" style="width:100%; padding:20px; font-size:1rem;" onclick="add()">ДОБАВИТЬ В СПИСОК</button>
+    <button class="btn-n" style="width:100%; background:none; margin-top:15px; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <script>
     let tab = 'tasks';
-    let clients = JSON.parse(localStorage.getItem('cl_v146')) || [];
-    let tasks = JSON.parse(localStorage.getItem('tk_v146')) || [];
-    let archive = JSON.parse(localStorage.getItem('ar_v146')) || [];
+    let filterCity = 'Все';
+    let clients = JSON.parse(localStorage.getItem('cl_v148')) || [];
+    let tasks = JSON.parse(localStorage.getItem('tk_v148')) || [];
+    let archive = JSON.parse(localStorage.getItem('ar_v148')) || [];
 
-    // Чистая функция управления окнами
-    function openModal(id) {
-        closeModal(); // Сначала закрываем всё открытое
-        document.getElementById(id).style.display = 'block';
-    }
-
-    function closeModal() {
-        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-    }
+    function openModal(id) { closeModal(); document.getElementById(id).style.display = 'block'; }
+    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
 
     function setTab(t) {
         tab = t;
@@ -109,6 +156,8 @@
         document.getElementById('t-' + t).classList.add('active');
         render();
     }
+
+    function setFilter(city) { filterCity = city; render(); }
 
     function clickPlus() {
         if(tab === 'clients') {
@@ -118,12 +167,8 @@
             document.getElementById('f-addr').value = "";
             openModal('win-client');
         } else if(tab === 'tasks') {
-            if(!clients.length) return alert("Сначала добавь клиентов в Базу!");
-            let sorted = [...clients].sort((a,b) => a.city.localeCompare(b.city));
-            document.getElementById('f-select').innerHTML = sorted.map((c)=> {
-                let originalIdx = clients.indexOf(c);
-                return `<option value="${originalIdx}">[${c.city}] ${c.name}</option>`;
-            }).join('');
+            if(!clients.length) return alert("База пуста!");
+            document.getElementById('f-select').innerHTML = clients.map((c, i) => `<option value="${i}">[${c.city}] ${c.name}</option>`).join('');
             openModal('win-order');
         }
     }
@@ -133,68 +178,79 @@
               ph = document.getElementById('f-phone').value, city = document.getElementById('f-city').value,
               idx = parseInt(document.getElementById('f-idx').value);
         if(!n || !a) return alert("Заполни данные!");
-        let obj = {name:n, addr:a, phone:ph, city:city};
+        let obj = {name:n, addr:a, phone:ph, city:city.replace('📍 ', '')};
         if(idx > -1) clients[idx] = obj; else clients.push(obj);
-        localStorage.setItem('cl_v146', JSON.stringify(clients));
+        localStorage.setItem('cl_v148', JSON.stringify(clients));
         closeModal(); render();
     }
 
     function add() {
         const c = clients[document.getElementById('f-select').value];
-        tasks.push({id: Date.now(), n: c.name, a: c.addr + ", " + c.city, ph: c.phone});
-        localStorage.setItem('tk_v146', JSON.stringify(tasks));
-        closeModal(); setTab('tasks');
+        tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone});
+        localStorage.setItem('tk_v148', JSON.stringify(tasks));
+        closeModal(); render();
     }
 
     function render() {
         const cont = document.getElementById('main-content');
-        cont.innerHTML = "";
-        if(tab === 'clients') {
+        const filtCont = document.getElementById('filter-container');
+        cont.innerHTML = ""; filtCont.innerHTML = "";
+
+        if(tab === 'tasks') {
+            const cities = ['Все', 'Ашкелон', 'Ашдод', 'Кирьят-Гат', 'Другой'];
+            filtCont.innerHTML = cities.map(c => `<button class="f-chip ${filterCity === c ? 'active' : ''}" onclick="setFilter('${c}')">${c}</button>`).join('');
+            
+            let displayTasks = filterCity === 'Все' ? tasks : tasks.filter(t => t.city === filterCity);
+            
+            cont.innerHTML += displayTasks.map((t) => `
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <div><b style="font-size:1.2rem;">${t.n}</b><br><small style="color:var(--primary); font-weight:bold;">📍 ${t.city}</small></div>
+                        <button onclick="delTask(${t.id})" style="background:#2C2C2E; border:none; color:var(--danger); width:30px; height:30px; border-radius:50%;">✕</button>
+                    </div>
+                    <div style="color:var(--gray); font-size:0.9rem; margin:12px 0;">🏠 ${t.a}</div>
+                    <div class="nav-grid">
+                        <a href="tel:${t.ph}" class="btn-n b-call">📞 ПОЗВОНИТЬ</a>
+                        <a href="waze://?q=${encodeURIComponent(t.a + ' ' + t.city)}&navigate=yes" class="btn-n b-waze">WAZE</a>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(t.a + ' ' + t.city)}&travelmode=walking" class="btn-n b-go">MAPS</a>
+                        <button class="btn-n b-done" onclick="done(${t.id})">✅ ДОСТАВЛЕНО</button>
+                    </div>
+                </div>`).join('') || "<p style='text-align:center; color:var(--gray); margin-top:40px;'>Список пуст</p>";
+        } else if(tab === 'clients') {
             ["Ашкелон", "Ашдод", "Кирьят-Гат", "Другой"].forEach(city => {
                 let filtered = clients.filter(c => c.city === city);
                 if(filtered.length > 0) {
                     cont.innerHTML += `<div class="city-divider">${city}</div>`;
                     filtered.forEach(c => {
                         let originalIdx = clients.indexOf(c);
-                        cont.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                            <div><b>${c.name}</b><br><small>${c.addr}</small></div>
-                            <div style="display:flex; gap:10px;">
-                                <button onclick="edit(${originalIdx})" style="background:none; border:none; font-size:1.2rem;">✏️</button>
-                                <button onclick="del(${originalIdx})" style="background:none; border:none; font-size:1.2rem;">🗑️</button>
+                        cont.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px;">
+                            <div><b>${c.name}</b><br><small style="color:var(--gray)">${c.addr}</small></div>
+                            <div style="display:flex; gap:12px;">
+                                <button onclick="edit(${originalIdx})" style="background:none; border:none; font-size:1.3rem;">✏️</button>
+                                <button onclick="del(${originalIdx})" style="background:none; border:none; font-size:1.3rem;">🗑️</button>
                             </div>
                         </div>`;
                     });
                 }
             });
-        } else if(tab === 'tasks') {
-            cont.innerHTML = tasks.map((t,i)=>`
-                <div class="card">
-                    <div style="font-weight:800; font-size:1.1rem; margin-bottom:5px;">${t.n}</div>
-                    <div style="color:var(--gray); font-size:0.85rem; margin-bottom:15px;">${t.a}</div>
-                    <div class="nav-grid">
-                        <a href="tel:${t.ph}" class="btn-n b-call">📞 ПОЗВОНИТЬ</a>
-                        <a href="waze://?q=${encodeURIComponent(t.a)}&navigate=yes" class="btn-n b-waze">WAZE</a>
-                        <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(t.a)}&travelmode=walking" class="btn-n b-walk">🚶 ПЕШКОМ</a>
-                        <button class="btn-n" style="grid-column:span 2; background:var(--success); color:black; margin-top:10px;" onclick="done(${i})">ДОСТАВЛЕНО</button>
-                    </div>
-                </div>`).join('');
+            if(!clients.length) cont.innerHTML = "<p style='text-align:center; color:var(--gray); margin-top:40px;'>База пуста</p>";
         } else {
-            cont.innerHTML = archive.slice().reverse().map(a=>`<div class="card" style="opacity:0.5"><b>${a.n}</b><br><small>${a.a}</small></div>`).join('');
+            cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.6"><b>${a.n}</b><br><small>${a.city}, ${a.a}</small></div>`).join('') || "<p style='text-align:center; color:var(--gray);'>Архив пуст</p>";
         }
     }
 
+    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v148', JSON.stringify(tasks)); render(); }
+    function done(id) { 
+        let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id);
+        localStorage.setItem('tk_v148', JSON.stringify(tasks)); localStorage.setItem('ar_v148', JSON.stringify(archive)); render();
+    }
     function edit(i) {
-        const c = clients[i];
-        document.getElementById('f-idx').value = i;
-        document.getElementById('f-name').value = c.name;
-        document.getElementById('f-phone').value = c.phone;
-        document.getElementById('f-addr').value = c.addr;
-        document.getElementById('f-city').value = c.city || "Ашкелон";
+        const c = clients[i]; document.getElementById('f-idx').value = i;
+        document.getElementById('f-name').value = c.name; document.getElementById('f-phone').value = c.phone;
+        document.getElementById('f-addr').value = c.addr; document.getElementById('f-city').value = "📍 " + (c.city || "Ашкелон");
         openModal('win-client');
     }
-
-    function del(i) { if(confirm("Удалить?")) { clients.splice(i,1); localStorage.setItem('cl_v146', JSON.stringify(clients)); render(); } }
-    function done(i) { archive.push(tasks[i]); tasks.splice(i, 1); localStorage.setItem('tk_v146', JSON.stringify(tasks)); localStorage.setItem('ar_v146', JSON.stringify(archive)); render(); }
+    function del(i) { if(confirm("Удалить клиента?")) { clients.splice(i,1); localStorage.setItem('cl_v148', JSON.stringify(clients)); render(); } }
 
     render();
 </script>
