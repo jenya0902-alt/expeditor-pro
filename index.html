@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Expeditor Elite v16.5</title>
+    <title>Expeditor Elite v16.7</title>
     <style>
         :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --danger: #FF453A; --success: #32D74B; --waze: #33CCFF; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
         body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: 100px; transition: background 0.5s; overflow-x: hidden; }
         
+        /* СТАТУС-БАР МОНИТОРИНГА */
         #alert-status { background: #151515; padding: 10px; text-align: center; font-size: 0.7rem; font-weight: 800; border-bottom: 0.5px solid var(--border); color: var(--success); position: sticky; top: 0; z-index: 1100; letter-spacing: 1px; }
         .alert-active { background: var(--danger) !important; color: white !important; animation: blink 0.6s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
@@ -32,12 +33,18 @@
         .b-call { background: #2C2C2E; grid-column: span 2; border: 0.5px solid var(--border); }
         .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 10px; padding: 18px; }
 
-        /* Модальные окна и выбор города */
+        /* ОКНА И СЕЛЕКТОРЫ */
         .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px 20px 40px; border-radius: 30px 30px 0 0; z-index: 2000; border-top: 0.5px solid var(--border); max-height: 90vh; overflow-y: auto; }
         input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; }
-        .city-selector-mini { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
-        .city-chip { background: #2C2C2E; border: 1px solid var(--border); color: var(--gray); padding: 8px 12px; border-radius: 10px; font-size: 0.7rem; white-space: nowrap; }
+        .city-chip { background: #2C2C2E; border: 1px solid var(--border); color: var(--gray); padding: 8px 12px; border-radius: 10px; font-size: 0.7rem; white-space: nowrap; margin-right: 5px; }
         .city-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* СТИЛИ ПОМОЩИ */
+        .help-section { margin-bottom: 25px; }
+        .help-title { color: var(--primary); font-size: 0.9rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; }
+        .help-item { background: #1C1C1E; padding: 15px; border-radius: 15px; border: 0.5px solid var(--border); margin-bottom: 10px; }
+        .help-item b { display: block; color: #fff; margin-bottom: 5px; font-size: 0.85rem; }
+        .help-item p { margin: 0; color: var(--gray); font-size: 0.75rem; line-height: 1.4; }
 
         .fab { position: fixed; bottom: 35px; right: 25px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: none; z-index: 1500; box-shadow: 0 10px 25px rgba(10, 132, 255, 0.4); }
         footer { text-align: center; color: #3A3A3C; font-size: 0.6rem; margin: 40px 0; letter-spacing: 2px; }
@@ -46,7 +53,7 @@
 </head>
 <body onclick="initAudio()">
 
-<div id="alert-status">ОЖИДАНИЕ ДАННЫХ...</div>
+<div id="alert-status">ПРОВЕРКА НЕБА...</div>
 
 <header>
     <a href="https://www.google.com/maps/search/public+shelter/@31.668,34.574,14z" class="sos-btn" target="_blank">🛡️ КАРТА SOS</a>
@@ -58,14 +65,14 @@
     <button id="t-tasks" class="tab-btn active" onclick="setTab('tasks')">МАРШРУТ</button>
     <button id="t-clients" class="tab-btn" onclick="setTab('clients')">БАЗА</button>
     <button id="t-archive" class="tab-btn" onclick="setTab('archive')">АРХИВ</button>
-    <button id="t-help" class="tab-btn" onclick="setTab('help')">📖 ИНФО</button>
+    <button id="t-help" class="tab-btn" onclick="setTab('help')">📖 ПОМОЩЬ</button>
 </div>
 
 <div id="filter-area" style="display: flex; gap: 8px; overflow-x: auto; padding: 0 15px 15px; scrollbar-width: none;"></div>
 <div id="main-content" class="container"></div>
 
 <button id="fab-plus" class="fab" onclick="clickPlus()">+</button>
-<footer>Jenya Ochakovski • v16.5</footer>
+<footer>Jenya Ochakovski • v16.7</footer>
 
 <div id="win-client" class="modal">
     <h3 style="text-align:center; margin-top:0;">Карточка клиента</h3>
@@ -79,8 +86,8 @@
 </div>
 
 <div id="win-order" class="modal">
-    <h3 style="text-align:center; margin-top:0;">Добавить город</h3>
-    <div class="city-selector-mini" id="order-city-selector"></div>
+    <h3 style="text-align:center; margin-top:0;">Добавить заказ</h3>
+    <div style="display:flex; gap:5px; overflow-x:auto; margin-bottom:15px;" id="order-city-selector"></div>
     <select id="f-select" size="5" style="height: auto;"></select>
     <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="addTask()">В МАРШРУТ</button>
     <button class="btn-n" style="width:100%; background:none; margin:10px 0; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
@@ -88,21 +95,20 @@
 
 <script>
     let activeTab = 'tasks', filterCity = 'Все', modalCity = 'Ашкелон', audioCtx = null;
-    let clients = JSON.parse(localStorage.getItem('cl_v165')) || [];
-    let tasks = JSON.parse(localStorage.getItem('tk_v165')) || [];
-    let archive = JSON.parse(localStorage.getItem('ar_v165')) || [];
+    let clients = JSON.parse(localStorage.getItem('cl_v167')) || [];
+    let tasks = JSON.parse(localStorage.getItem('tk_v167')) || [];
+    let archive = JSON.parse(localStorage.getItem('ar_v167')) || [];
 
     const citiesList = ['Ашкелон', 'Ашдод', 'Кирьят-Гат', 'Другой'];
 
+    // МОНИТОРИНГ ЦЕВА АДОМ
     async function checkAlerts() {
         const status = document.getElementById('alert-status');
-        const myCities = ["אשקלון", "אשדוד", "קרית גת"];
         try {
             const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.oref.org.il/WarningMessages/History/AlertsHistory.json') + '&t=' + Date.now());
             const json = await response.json();
             const alerts = JSON.parse(json.contents);
-            const danger = alerts.find(a => myCities.includes(a.data));
-
+            const danger = alerts.find(a => ["אשקלון", "אשדוד", "קרית גת"].includes(a.data));
             if (danger) {
                 status.innerHTML = `🚨 ТРЕВОГА: ${danger.data}!`;
                 status.classList.add('alert-active');
@@ -111,12 +117,11 @@
             } else {
                 status.innerHTML = "● НЕБО ЧИСТОЕ (ONLINE)";
                 status.classList.remove('alert-active');
-                document.body.style.background = "var(--bg)";
+                document.body.style.background = "#000";
             }
-        } catch (e) {
-            status.innerHTML = "● МОНИТОРИНГ АКТИВЕН";
-        }
+        } catch (e) { status.innerHTML = "● МОНИТОРИНГ АКТИВЕН"; }
     }
+    setInterval(checkAlerts, 5000);
 
     function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
     function playSiren() {
@@ -128,11 +133,9 @@
         o.connect(g); g.connect(audioCtx.destination);
         o.start(); o.stop(audioCtx.currentTime + 0.5);
     }
-    
-    setInterval(checkAlerts, 5000);
 
     const closeModal = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-    
+
     function setTab(t) { 
         activeTab = t; 
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-'+t));
@@ -147,7 +150,6 @@
         if (activeTab === 'tasks') {
             filt.innerHTML = ['Все', ...citiesList].map(c => `<button class="city-chip ${filterCity === c ? 'active' : ''}" onclick="filterCity='${c}'; render();">${c}</button>`).join('');
             let list = filterCity === 'Все' ? tasks : tasks.filter(t => t.city === filterCity);
-            
             if (list.length > 0) {
                 const b = document.createElement('button'); b.className = 'multi-route-btn'; b.innerText = `🗺️ ОБЩИЙ МАРШРУТ (${list.length})`;
                 b.onclick = () => window.open(`https://www.google.com/maps/dir/` + list.map(t => encodeURIComponent(t.a + " " + t.city)).join('/'), '_blank');
@@ -159,16 +161,38 @@
                 <div class="nav-grid">
                     <a href="tel:${t.ph}" class="btn-n b-call">📞 ПОЗВОНИТЬ</a>
                     <a href="waze://?q=${encodeURIComponent(t.a+' '+t.city)}&navigate=yes" class="btn-n b-waze">WAZE</a>
-                    <a href="https://www.google.com/maps/search/${encodeURIComponent(t.a+' '+t.city)}" target="_blank" class="btn-n b-go">GOOGLE</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t.a+' '+t.city)}" target="_blank" class="btn-n b-go">GOOGLE</a>
                     <button class="btn-n b-done" onclick="done(${t.id})">✅ ГОТОВО</button>
                 </div></div>`).join('');
+
         } else if (activeTab === 'clients') {
             cont.innerHTML = clients.map((c, i) => `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
                 <div><b>${c.name}</b><br><small class="hebrew" style="color:var(--gray)">${c.addr} (${c.city})</small></div>
                 <div style="display:flex; gap:15px;"><button onclick="editClient(${i})" style="background:none; border:none; font-size:1.4rem;">✏️</button><button onclick="delClient(${i})" style="background:none; border:none; font-size:1.4rem;">🗑️</button></div></div>`).join('');
+        
         } else if (activeTab === 'help') {
-            cont.innerHTML = `<div class="card"><b>🏙️ ГОРОДА</b><br><small>В окне добавления теперь можно выбрать город сверху, чтобы не искать нужного клиента в общем списке.</small></div>
-            <div class="card" style="background:var(--danger); border:none;"><b>🚨 SOS КАРТА</b><br><small>Быстрый доступ к карте убежищ Ашкелона и окрестностей.</small></div>`;
+            cont.innerHTML = `
+                <div class="help-section">
+                    <div class="help-title">🛡️ Безопасность</div>
+                    <div class="help-item">
+                        <b>Что делать при сирене?</b>
+                        <p>Останови машину на обочине, выйди и ляг на землю. Жди 10 минут. Кнопка SOS сверху откроет карту ближайших убежищ.</p>
+                    </div>
+                </div>
+                <div class="help-section">
+                    <div class="help-title">🏙️ Работа по городам</div>
+                    <div class="help-item">
+                        <b>Как добавить заказ?</b>
+                        <p>Нажми "+", выбери город (Ашкелон, Ашдод и т.д.) кнопкой сверху, и в списке появятся только магазины этого города.</p>
+                    </div>
+                </div>
+                <div class="help-section">
+                    <div class="help-title">📋 Навигация</div>
+                    <div class="help-item">
+                        <b>Общий маршрут:</b>
+                        <p>Зеленая кнопка сверху в "Маршруте" строит путь через все точки сразу в Google Maps.</p>
+                    </div>
+                </div>`;
         } else {
             cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.4;"><b>${a.n}</b><br><small>${a.a}</small></div>`).join('');
         }
@@ -186,19 +210,13 @@
         }
     }
 
-    // ЛОГИКА ОКНА ДОБАВЛЕНИЯ
     function updateOrderModalCities() {
         const selector = document.getElementById('order-city-selector');
         selector.innerHTML = citiesList.map(c => `<button class="city-chip ${modalCity === c ? 'active' : ''}" onclick="modalCity='${c}'; updateOrderModalCities();">${c}</button>`).join('');
-        
-        const filteredClients = clients.filter(c => c.city === modalCity);
+        const filtered = clients.filter(c => c.city === modalCity);
         const select = document.getElementById('f-select');
-        select.innerHTML = filteredClients.length 
-            ? filteredClients.map((c) => {
-                // Находим оригинальный индекс в массиве clients
-                const originalIndex = clients.indexOf(c);
-                return `<option value="${originalIndex}">${c.name}</option>`;
-            }).join('')
+        select.innerHTML = filtered.length 
+            ? filtered.map(c => `<option value="${clients.indexOf(c)}">${c.name}</option>`).join('')
             : `<option disabled>В этом городе нет клиентов</option>`;
     }
 
@@ -206,24 +224,24 @@
         const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, ph = document.getElementById('f-phone').value, city = document.getElementById('f-city').value, idx = parseInt(document.getElementById('f-idx').value);
         if (!n || !a) return;
         if (idx > -1) clients[idx] = {name:n, addr:a, phone:ph, city:city}; else clients.push({name:n, addr:a, phone:ph, city:city});
-        localStorage.setItem('cl_v165', JSON.stringify(clients)); closeModal(); render();
+        localStorage.setItem('cl_v167', JSON.stringify(clients)); closeModal(); render();
     }
 
     function addTask() {
         const val = document.getElementById('f-select').value;
-        if (val === "" || isNaN(val)) return alert("Выберите клиента из списка");
+        if (!val || isNaN(val)) return;
         const c = clients[val];
         tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone});
-        localStorage.setItem('tk_v165', JSON.stringify(tasks)); closeModal(); render();
+        localStorage.setItem('tk_v167', JSON.stringify(tasks)); closeModal(); render();
     }
 
-    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v165', JSON.stringify(tasks)); render(); }
-    function done(id) { let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); localStorage.setItem('tk_v165', JSON.stringify(tasks)); localStorage.setItem('ar_v163', JSON.stringify(archive)); render(); }
+    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v167', JSON.stringify(tasks)); render(); }
+    function done(id) { let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); localStorage.setItem('tk_v167', JSON.stringify(tasks)); localStorage.setItem('ar_v167', JSON.stringify(archive)); render(); }
     function editClient(i) { 
         const c = clients[i]; document.getElementById('f-idx').value = i; document.getElementById('f-name').value = c.name;
         document.getElementById('f-phone').value = c.phone; document.getElementById('f-addr').value = c.addr; document.getElementById('f-city').value = c.city; document.getElementById('win-client').style.display = 'block'; 
     }
-    function delClient(i) { if(confirm("Удалить?")) { clients.splice(i,1); localStorage.setItem('cl_v165', JSON.stringify(clients)); render(); } }
+    function delClient(i) { if(confirm("Удалить клиента?")) { clients.splice(i,1); localStorage.setItem('cl_v167', JSON.stringify(clients)); render(); } }
 
     render();
     checkAlerts();
