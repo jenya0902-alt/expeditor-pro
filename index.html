@@ -3,6 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Expeditor Elite v18.1</title>
+    <style>
+        :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --danger: #FF453A; --success: #32D74B; --waze: #33CCFF; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
+        body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: 120px; padding-top: env(safe-area-inset-top); overflow-x: hidden; }
+        
+        #alert-status { background: #151515; padding: 15px; text-align: center; font-size: 0.85rem; font-weight: 800; border-bottom: 1px solid var(--border); color: var(--success); position: sticky; top: 0; z-index: 2000; }
+        .alert-active { background: var(--danger) !important; color: white !important; animation: blink 0.6s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        header { padding: 15px 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 45px; z-index: 1000; }
+        .route-all-btn { background: #34C759; color: #000; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 0.7rem; border: none; }
+        
+        .tabs { display: flex; background: #1C1C1E; margin: 15px; border-radius: 14px; padding: 3px; border: 0.5px solid var(--border); }
+        .tab-btn { flex: 1; border: none; background: none; padding: 12px; color: var(--gray); font-weight: 600; border-radius: 11px; font-size: 0.65rem; }
+        .tab-btn.active { background: #3A3A3C; color: white; }
+
+        .container { padding: 0 15px; }
+        .card { background: var(--card-bg); border-radius: 24px; margin-bottom: 15px; padding: 20px; border: 0.5px solid var(--border); }
+        
+        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-n { border-radius: 14px; padding: 16px; text-decoration: none; font-size: 0.75rem; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; border: none; }
+        .b-waze { background: var(--waze); color: #000; }
+        .b-call { background: #2C2C2E; border: 0.5px solid var(--border); }
+        .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 10px; }
+
+        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px 20px 40px; border-radius: 30px 30px 0 0; z-index: 3000; border-top: 1px solid var(--border); }
+        input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); }
+        
+        .fab { position: fixed; bottom: 35px; right: 25px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; border: none; z-index: 1500; }
+        .hebrew { direction: rtl; text-align: right; }
+        .help-item { margin-bottom: 20px; }
+        .help-title { color: var(--primary); font-weight: 800; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<div id="alert-status">● СИСТЕМА ГОТОВА</div>
+
+<header>
+    <button class="route-all-btn" onclick="openFullRoute()">🗺️ ВЕСЬ МАРШРУТ</button>
+    <div style="font-weight:900;">Expeditor</div>
+    <a href="https://www.oref.org.il/" class="btn-n" style="background:rgba(255,69,58,0.2); color:var(--danger); padding:8px 15px; border-radius:10px; font-size:0.7rem; border:1px solid var(--danger);">🛡️ SOS</a>
+</header>
+
+<div class="tabs">
+    <button id="t-tasks" class="tab-btn active" onclick="setTab('tasks')">МАРШРУТ</button>
+    <button id="t-clients" class="tab-btn" onclick="setTab('clients')">БАЗА</button>
+    <button id="t-archive" class="tab-btn" onclick="setTab('archive')">АРХИВ</button>
+    <button id="t-help" class="tab-btn" onclick="setTab('help')">ПОМОЩЬ</button>
+</div>
+
+<div id="filter-area" style="display:flex; gap:8px; overflow-x:auto; padding:0 15px 15px;"></div>
+<div id="main-content" class="container"></div>
+
+<button id="fab-plus" class="fab" onclick="clickPlus()">+</button>
+
+<div id="win-order" class="modal">
+    <h3 style="text-align:center;">Добавить в маршрут</h3>
+    <div id="order-city-selector" style="display:flex; gap:5px; overflow-x:auto; margin-bottom:15px;"></div>
+    <select id="f-select" size="5"></select>
+    <button class="btn-n" style="width:100%; background:var(--primary);" onclick="addTask()">ДОБАВИТЬ</button>
+    <button class="btn-n" style="width:100%; background:none; color:var(--gray);" onclick="closeModal()">ОТМЕНА</button>
+</div>
+
+<div id="win-client" class="modal">
+    <h3 style="text-align:center;">Новое Имя</h3>
+    <input type="hidden" id="f-idx" value="-1">
+    <select id="f-city"><option>Ашкелон</option><option>Ашдод</option><option>Кирьят-Гат</option><option>Другой</option></select>
+    <input type="text" id="f-name" placeholder="Имя / Название">
+    <input type="tel" id="f-phone" placeholder="Телефон">
+    <input type="text" id="f-addr" class="hebrew" placeholder="Адрес (иврит)">
+    <button class="btn-n" style="width:100%; background:var(--primary);" onclick="saveClient()">СОХРАНИТЬ</button>
+    <button class="btn-n" style="width:100%; background:none; color:var(--gray);" onclick="closeModal()">ОТМЕНА</button>
+</div>
+
+<script>
+    let activeTab = 'tasks', filterCity = 'Все', modalCity = 'Ашкелон';
+    let clients = JSON.parse(localStorage.getItem('cl_v178')) || [];
+    let tasks = JSON.parse(localStorage.getItem('tk_v178')) || [];
+    let archive = JSON.parse(localStorage.getItem('ar_v178')) || [];
+    const citiesList = ['Ашкелон', 'Ашдод', 'Кирьят-Гат', 'Другой'];
+
+    function setTab(t) { 
+        activeTab = t; 
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 't-'+t));
+        render(); 
+    }
+
+    function render() {
+        const cont = document.getElementById('main-content'), filt = document.getElementById('filter-area');
+        cont.innerHTML = ""; filt.innerHTML = "";
+
+        if (activeTab === 'tasks') {
+            filt.innerHTML = ['Все', ...citiesList].map(c => `<button class="city-chip ${filterCity===c?'active':''}" style="padding:10px 15px; border-radius:12px; border:none; background:${filterCity===c?'var(--primary)':'#2C2C2E'}; color:white; font-size:0.7rem;" onclick="filterCity='${c}'; render();">${c}</button>`).join('');
+            let list = tasks.map((t, i) => ({...t, origIdx: i})).filter(t => filterCity === 'Все' || t.city === filterCity);
+            cont.innerHTML = list.map(t => `
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <div><button onclick="moveTask(${t.origIdx},-1)" style="background:#2C2C2E; color:white; border:none; padding:10px; border-radius:8px;">↑</button>
+                        <button onclick="moveTask(${t.origIdx},1)" style="background:#2C2C2E; color:white; border:none; padding:10px; border-radius:8px;">↓</button></div>
+                        <button onclick="delTask(${t.id})" style="background:none; border:none; color:var(--gray); font-size:1.2rem;">✕</button>
+                    </div>
+                    <b style="font-size:1.1rem;">${t.n}</b>
+                    <div class="hebrew" style="color:var(--gray); margin-top:5px;">${t.a} (${t.city})</div>
+                    <div class="nav-grid">
+                        <a href="tel:${t.ph}" class="btn-n b-call">📞 ЗВОНОК</a>
+                        <a href="https://waze.com/ul?q=${encodeURIComponent(t.a+' '+t.city)}&navigate=yes" class="btn-n b-waze">🚗 WAZE</a>
+                        <button class="btn-n b-done" onclick="done(${t.id})">✅ РАЗГРУЗИЛАСЬ</button>
+                    </div>
+                </div>`).join('');
+        } else if (activeTab === 'clients') {
+            cont.innerHTML = clients.map((c, i) => `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                <div><b>${c.name}</b><br><small class="hebrew">${c.addr}</small></div>
+                <button onclick="editClient(${i})" style="background:none; border:none; font-size:1.2rem;">✏️</button></div>`).join('');
+        } else if (activeTab === 'archive') {
+            cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.6;"><b>${a.n}</b><br>${a.a}</div>`).join('');
+        } else if (activeTab === 'help') {
+            cont.innerHTML = `
+                <div class="card">
+                    <div class="help-item"><div class="help-title">🗺️ Весь маршрут</div><div>Нажми кнопку вверху — откроется Google Maps. Там видно все точки "змеёй". Посмотри план и возвращайся сюда.</div></div>
+                    <div class="help-item"><div class="help-title">🚗 Waze</div><div>В каждой карточке жми Waze, чтобы ехать к конкретному человеку с радарами и пробками.</div></div>
+                    <div class="help-item"><div class="help-title">✅ Разгрузилась</div><div>Когда закончила точку, жми кнопку. Она уйдет в архив, и список станет короче.</div></div>
+                </div>`;
+        }
+    }
+
+    function openFullRoute() {
+        let list = tasks.filter(t => filterCity === 'Все' || t.city === filterCity);
+        if (list.length === 0) return alert("Добавь точки в маршрут!");
+        let waypoints = list.map(t => encodeURIComponent(t.a + " " + t.city)).join('/');
+        window.open(`https://www.google.com/maps/dir/${waypoints}`, '_blank');
+    }
+
+    function clickPlus() {
+        if(activeTab==='clients') {
+            document.getElementById('f-idx').value="-1"; document.getElementById('f-name').value=""; document.getElementById('f-addr').value="";
+            document.getElementById('win-client').style.display='block';
+        } else {
+            updateOrderCities(); document.getElementById('win-order').style.display='block';
+        }
+    }
+
+    function updateOrderCities() {
+        const sel = document.getElementById('order-city-selector');
+        sel.innerHTML = citiesList.map(c => `<button onclick="modalCity='${c}';updateOrderCities();" style="border:none; padding:10px; border-radius:10px; background:${modalCity===c?'var(--primary)':'#2C2C2E'}; color:white;">${c}</button>`).join('');
+        const list = clients.filter(c => c.city === modalCity);
+        document.getElementById('f-select').innerHTML = list.map(c => `<option value="${clients.indexOf(c)}">${c.name}</option>`).join('');
+    }
+
+    function saveClient() {
+        const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, p = document.getElementById('f-phone').value, c = document.getElementById('f-city').value, i = parseInt(document.getElementById('f-idx').value);
+        if(!n || !a) return;
+        if(i > -1) clients[i] = {name:n, addr:a, phone:p, city:c}; else clients.push({name:n, addr:a, phone:p, city:c});
+        localStorage.setItem('cl_v178', JSON.stringify(clients)); closeModal(); render();
+    }
+
+    function addTask() {
+        const v = document.getElementById('f-select').value; if(v==="") return;
+        const c = clients[v]; tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone});
+        localStorage.setItem('tk_v178', JSON.stringify(tasks)); closeModal(); render();
+    }
+
+    function moveTask(idx, dir) {
+        let nIdx = idx + dir; if(nIdx>=0 && nIdx<tasks.length) { [tasks[idx], tasks[nIdx]] = [tasks[nIdx], tasks[idx]]; localStorage.setItem('tk_v178', JSON.stringify(tasks)); render(); }
+    }
+    function delTask(id) { tasks = tasks.filter(t => t.id!==id); localStorage.setItem('tk_v178', JSON.stringify(tasks)); render(); }
+    function done(id) { let t = tasks.find(x => x.id===id); archive.push(t); tasks = tasks.filter(x => x.id!==id); localStorage.setItem('tk_v178', JSON.stringify(tasks)); localStorage.setItem('ar_v178', JSON.stringify(archive)); render(); }
+    function editClient(i) { const c = clients[i]; document.getElementById('f-idx').value=i; document.getElementById('f-name').value=c.name; document.getElementById('f-addr').value=c.addr; document.getElementById('f-city').value=c.city; document.getElementById('f-phone').value=c.phone; document.getElementById('win-client').style.display='block'; }
+    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
+    function initAudio() {}
+
+    render();
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
