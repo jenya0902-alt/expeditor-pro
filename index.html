@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Экспедитор Pro v14.5</title>
+    <title>Экспедитор Pro v14.6</title>
     <style>
         :root { --primary: #007AFF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --danger: #FF453A; --success: #32D74B; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
@@ -29,15 +29,11 @@
         .b-walk { background: #A2845E; grid-column: span 2; }
         .b-call { background: #2C2C2E; grid-column: span 2; margin-bottom: 5px; }
 
-        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 30px 20px 60px; border-radius: 25px 25px 0 0; z-index: 2000; border-top: 1px solid var(--border); box-shadow: 0 -10px 30px rgba(0,0,0,0.8); overflow-y: auto; max-height: 90vh; }
+        .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 30px 20px 60px; border-radius: 25px 25px 0 0; z-index: 2000; border-top: 1px solid var(--border); box-shadow: 0 -10px 30px rgba(0,0,0,0.9); }
         input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; }
         
-        .help-text { text-align: left; line-height: 1.5; font-size: 0.95rem; }
-        .help-text b { color: var(--primary); }
-        .help-step { margin-bottom: 15px; background: #262629; padding: 12px; border-radius: 10px; }
-
         .fab { position: fixed; bottom: 35px; right: 25px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; border: none; z-index: 1500; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        footer { text-align: center; color: #38383A; font-size: 0.65rem; margin: 30px 0; letter-spacing: 1px; text-transform: uppercase; }
+        footer { text-align: center; color: #38383A; font-size: 0.65rem; margin: 30px 0; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -45,7 +41,7 @@
 <header>
     <button class="sos-btn" onclick="window.open('https://www.google.com/maps/search/bomb+shelter', '_blank')">🛡️ УБЕЖИЩЕ</button>
     <div style="font-weight: 800; color: var(--primary); font-size: 0.9rem;">EXPEDITOR PRO</div>
-    <button class="help-btn" onclick="openHelp()">?</button>
+    <button class="help-btn" onclick="openModal('win-help')">?</button>
 </header>
 
 <div class="tabs">
@@ -61,26 +57,11 @@
 <footer>Author: Jenya Ochakovski</footer>
 
 <div id="win-help" class="modal">
-    <h2 style="margin-top:0; text-align:center; color: var(--primary);">Как пользоваться</h2>
-    <div class="help-text">
-        <div class="help-step">
-            1️⃣ <b>Добавь клиентов в Базу:</b><br>
-            Перейди во вкладку «БАЗА», нажми <b>[+]</b> и введи данные клиентов. Они сохранятся по городам.
-        </div>
-        <div class="help-step">
-            2️⃣ <b>Создай Маршрут:</b><br>
-            Перейди во вкладку «МАРШРУТ», нажми <b>[+]</b> и выбери нужного клиента из списка.
-        </div>
-        <div class="help-step">
-            3️⃣ <b>Навигация:</b><br>
-            Жми <b>WAZE</b> для машины или <b>ПЕШКОМ</b> для Google Карт.
-        </div>
-        <div class="help-step">
-            4️⃣ <b>Завершение:</b><br>
-            Когда заказ доставлен, жми кнопку <b>ГОТОВО</b>. Он уйдет в «АРХИВ».
-        </div>
-    </div>
-    <button class="btn-n b-go" style="width:100%; margin-top:10px; padding:18px;" onclick="closeAll()">ВСЁ ПОНЯТНО</button>
+    <h2 style="margin-top:0; text-align:center; color: var(--primary);">Справка</h2>
+    <p>1. В <b>Базе</b> добавляй клиентов по городам.</p>
+    <p>2. В <b>Маршруте</b> добавляй их в список кнопкой [+].</p>
+    <p>3. Жми <b>Готово</b>, чтобы убрать в Архив.</p>
+    <button class="btn-n b-go" style="width:100%; margin-top:10px; padding:18px;" onclick="closeModal()">ЗАКРЫТЬ</button>
 </div>
 
 <div id="win-client" class="modal">
@@ -92,25 +73,35 @@
         <option value="Кирьят-Гат">Кирьят-Гат</option>
         <option value="Другой">Другой город</option>
     </select>
-    <input type="text" id="f-name" placeholder="Имя / Название">
+    <input type="text" id="f-name" placeholder="Имя">
     <input type="tel" id="f-phone" placeholder="Телефон">
     <input type="text" id="f-addr" placeholder="Улица и дом">
-    <button class="btn-n b-go" style="width:100%; padding:18px;" onclick="save()">СОХРАНИТЬ В БАЗУ</button>
-    <button class="btn-n" style="width:100%; background:none; margin-top:10px; color:var(--gray)" onclick="closeAll()">ОТМЕНА</button>
+    <button class="btn-n b-go" style="width:100%; padding:18px;" onclick="save()">СОХРАНИТЬ</button>
+    <button class="btn-n" style="width:100%; background:none; margin-top:10px; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <div id="win-order" class="modal">
-    <h3 style="margin-top:0; text-align:center;">Добавить в поездку</h3>
+    <h3 style="margin-top:0; text-align:center;">В путь</h3>
     <select id="f-select"></select>
-    <button class="btn-n b-go" style="width:100%; padding:18px;" onclick="add()">ДОБАВИТЬ СЕЙЧАС</button>
-    <button class="btn-n" style="width:100%; background:none; margin-top:10px; color:var(--gray)" onclick="closeAll()">ОТМЕНА</button>
+    <button class="btn-n b-go" style="width:100%; padding:18px;" onclick="add()">ДОБАВИТЬ</button>
+    <button class="btn-n" style="width:100%; background:none; margin-top:10px; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <script>
     let tab = 'tasks';
-    let clients = JSON.parse(localStorage.getItem('cl_v145')) || [];
-    let tasks = JSON.parse(localStorage.getItem('tk_v145')) || [];
-    let archive = JSON.parse(localStorage.getItem('ar_v145')) || [];
+    let clients = JSON.parse(localStorage.getItem('cl_v146')) || [];
+    let tasks = JSON.parse(localStorage.getItem('tk_v146')) || [];
+    let archive = JSON.parse(localStorage.getItem('ar_v146')) || [];
+
+    // Чистая функция управления окнами
+    function openModal(id) {
+        closeModal(); // Сначала закрываем всё открытое
+        document.getElementById(id).style.display = 'block';
+    }
+
+    function closeModal() {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    }
 
     function setTab(t) {
         tab = t;
@@ -119,51 +110,46 @@
         render();
     }
 
-    function openHelp() { document.getElementById('win-help').style.display = 'block'; }
-
     function clickPlus() {
         if(tab === 'clients') {
             document.getElementById('f-idx').value = "-1";
             document.getElementById('f-name').value = "";
             document.getElementById('f-phone').value = "";
             document.getElementById('f-addr').value = "";
-            document.getElementById('win-client').style.display = 'block';
-        } else {
-            if(!clients.length) return alert("Сначала добавь клиентов в БАЗУ!");
+            openModal('win-client');
+        } else if(tab === 'tasks') {
+            if(!clients.length) return alert("Сначала добавь клиентов в Базу!");
             let sorted = [...clients].sort((a,b) => a.city.localeCompare(b.city));
             document.getElementById('f-select').innerHTML = sorted.map((c)=> {
                 let originalIdx = clients.indexOf(c);
                 return `<option value="${originalIdx}">[${c.city}] ${c.name}</option>`;
             }).join('');
-            document.getElementById('win-order').style.display = 'block';
+            openModal('win-order');
         }
     }
 
     function save() {
-        const n = document.getElementById('f-name').value, 
-              a = document.getElementById('f-addr').value, 
-              ph = document.getElementById('f-phone').value, 
-              city = document.getElementById('f-city').value,
+        const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, 
+              ph = document.getElementById('f-phone').value, city = document.getElementById('f-city').value,
               idx = parseInt(document.getElementById('f-idx').value);
-        if(!n || !a) return alert("Заполни Имя и Адрес!");
+        if(!n || !a) return alert("Заполни данные!");
         let obj = {name:n, addr:a, phone:ph, city:city};
         if(idx > -1) clients[idx] = obj; else clients.push(obj);
-        localStorage.setItem('cl_v145', JSON.stringify(clients));
-        closeAll(); render();
+        localStorage.setItem('cl_v146', JSON.stringify(clients));
+        closeModal(); render();
     }
 
     function add() {
         const c = clients[document.getElementById('f-select').value];
         tasks.push({id: Date.now(), n: c.name, a: c.addr + ", " + c.city, ph: c.phone});
-        localStorage.setItem('tk_v145', JSON.stringify(tasks));
-        closeAll(); setTab('tasks');
+        localStorage.setItem('tk_v146', JSON.stringify(tasks));
+        closeModal(); setTab('tasks');
     }
 
     function render() {
         const cont = document.getElementById('main-content');
         cont.innerHTML = "";
         if(tab === 'clients') {
-            if(!clients.length) return cont.innerHTML = "<p style='text-align:center; color:var(--gray); margin-top:50px;'>База пуста. Нажми [+]</p>";
             ["Ашкелон", "Ашдод", "Кирьят-Гат", "Другой"].forEach(city => {
                 let filtered = clients.filter(c => c.city === city);
                 if(filtered.length > 0) {
@@ -171,7 +157,7 @@
                     filtered.forEach(c => {
                         let originalIdx = clients.indexOf(c);
                         cont.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                            <div><b>${c.name}</b><br><small style="color:var(--gray)">${c.addr}</small></div>
+                            <div><b>${c.name}</b><br><small>${c.addr}</small></div>
                             <div style="display:flex; gap:10px;">
                                 <button onclick="edit(${originalIdx})" style="background:none; border:none; font-size:1.2rem;">✏️</button>
                                 <button onclick="del(${originalIdx})" style="background:none; border:none; font-size:1.2rem;">🗑️</button>
@@ -181,20 +167,19 @@
                 }
             });
         } else if(tab === 'tasks') {
-            if(!tasks.length) return cont.innerHTML = "<p style='text-align:center; color:var(--gray); margin-top:50px;'>Добавь клиентов в маршрут через [+]</p>";
             cont.innerHTML = tasks.map((t,i)=>`
                 <div class="card">
-                    <div style="margin-bottom:8px; font-weight:800; font-size:1.1rem;">${t.n}</div>
-                    <div style="color:var(--gray); font-size:0.9rem; margin-bottom:15px;">${t.a}</div>
+                    <div style="font-weight:800; font-size:1.1rem; margin-bottom:5px;">${t.n}</div>
+                    <div style="color:var(--gray); font-size:0.85rem; margin-bottom:15px;">${t.a}</div>
                     <div class="nav-grid">
                         <a href="tel:${t.ph}" class="btn-n b-call">📞 ПОЗВОНИТЬ</a>
                         <a href="waze://?q=${encodeURIComponent(t.a)}&navigate=yes" class="btn-n b-waze">WAZE</a>
                         <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(t.a)}&travelmode=walking" class="btn-n b-walk">🚶 ПЕШКОМ</a>
-                        <button class="btn-n" style="grid-column:span 2; background:var(--success); color:black; margin-top:10px;" onclick="done(${i})">ДОСТАВЛЕНО (В АРХИВ)</button>
+                        <button class="btn-n" style="grid-column:span 2; background:var(--success); color:black; margin-top:10px;" onclick="done(${i})">ДОСТАВЛЕНО</button>
                     </div>
                 </div>`).join('');
         } else {
-            cont.innerHTML = archive.slice().reverse().map(a=>`<div class="card" style="opacity:0.5"><b>${a.n}</b><br><small>${a.a}</small></div>`).join('') || "В архиве пусто";
+            cont.innerHTML = archive.slice().reverse().map(a=>`<div class="card" style="opacity:0.5"><b>${a.n}</b><br><small>${a.a}</small></div>`).join('');
         }
     }
 
@@ -205,12 +190,11 @@
         document.getElementById('f-phone').value = c.phone;
         document.getElementById('f-addr').value = c.addr;
         document.getElementById('f-city').value = c.city || "Ашкелон";
-        document.getElementById('win-client').style.display = 'block';
+        openModal('win-client');
     }
 
-    function del(i) { if(confirm("Удалить клиента?")) { clients.splice(i,1); localStorage.setItem('cl_v145', JSON.stringify(clients)); render(); } }
-    function done(i) { archive.push(tasks[i]); tasks.splice(i, 1); localStorage.setItem('tk_v145', JSON.stringify(tasks)); localStorage.setItem('ar_v145', JSON.stringify(archive)); render(); }
-    function closeAll() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
+    function del(i) { if(confirm("Удалить?")) { clients.splice(i,1); localStorage.setItem('cl_v146', JSON.stringify(clients)); render(); } }
+    function done(i) { archive.push(tasks[i]); tasks.splice(i, 1); localStorage.setItem('tk_v146', JSON.stringify(tasks)); localStorage.setItem('ar_v146', JSON.stringify(archive)); render(); }
 
     render();
 </script>
