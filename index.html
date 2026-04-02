@@ -9,57 +9,27 @@
     <meta name="apple-mobile-web-app-title" content="Expeditor">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2991/2991231.png">
 
-    <title>Expeditor Elite v17.1</title>
+    <title>Expeditor Elite v17.2</title>
     <style>
         :root { --primary: #0A84FF; --bg: #000; --card-bg: #1C1C1E; --text: #FFF; --gray: #8E8E93; --border: #38383A; --danger: #FF453A; --success: #32D74B; --waze: #33CCFF; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
         
-        body { 
-            background: var(--bg); 
-            margin: 0; 
-            color: var(--text); 
-            padding-bottom: 120px; 
-            overflow-x: hidden;
-            /* ОТСТУП СВЕРХУ ДЛЯ IPHONE */
-            padding-top: env(safe-area-inset-top);
-        }
+        body { background: var(--bg); margin: 0; color: var(--text); padding-bottom: 120px; overflow-x: hidden; padding-top: env(safe-area-inset-top); }
         
-        /* МОНИТОРИНГ - ТЕПЕРЬ С ВИДИМЫМ ОТСТУПОМ */
+        /* МОНИТОРИНГ */
         #alert-status { 
-            background: #151515; 
-            padding: 12px 10px; 
-            text-align: center; 
-            font-size: 0.8rem; 
-            font-weight: 800; 
-            border-bottom: 1px solid var(--border); 
-            color: var(--success); 
-            position: sticky; 
-            top: 0; 
-            z-index: 2000;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            backdrop-filter: blur(10px);
+            background: #151515; padding: 15px 10px; text-align: center; font-size: 0.85rem; 
+            font-weight: 800; border-bottom: 1px solid var(--border); color: var(--success); 
+            position: sticky; top: 0; z-index: 2000; text-transform: uppercase; letter-spacing: 1px;
         }
         .alert-active { background: var(--danger) !important; color: white !important; animation: blink 0.6s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-        header { 
-            padding: 15px 20px; 
-            background: rgba(0, 0, 0, 0.8); 
-            backdrop-filter: blur(20px); 
-            border-bottom: 0.5px solid var(--border); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: sticky; 
-            top: 44px; /* Чтобы шел сразу под мониторингом */
-            z-index: 1000; 
-        }
-        
+        header { padding: 15px 20px; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 50px; z-index: 1000; }
         .logo-text { font-weight: 900; font-size: 1.3rem; color: white; }
         .sos-btn { background: rgba(255, 69, 58, 0.2); color: var(--danger); padding: 8px 15px; border-radius: 10px; font-weight: 800; border: 1px solid var(--danger); font-size: 0.7rem; text-decoration: none; }
         
-        /* ВКЛАДКИ */
+        /* ТАБЫ */
         .tabs { display: flex; background: #1C1C1E; margin: 15px; border-radius: 14px; padding: 3px; border: 0.5px solid var(--border); }
         .tab-btn { flex: 1; border: none; background: none; padding: 12px; color: var(--gray); font-weight: 600; border-radius: 11px; font-size: 0.7rem; }
         .tab-btn.active { background: #3A3A3C; color: white; }
@@ -77,38 +47,42 @@
         .b-call { background: #2C2C2E; grid-column: span 2; border: 0.5px solid var(--border); }
         .b-done { background: var(--success); color: #000; grid-column: span 2; margin-top: 10px; }
 
-        /* ИНСТРУКЦИЯ */
+        /* ОКНО УСТАНОВКИ */
         #pwa-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.95); z-index: 5000; padding: 60px 20px; text-align: center;
         }
         .inst-card { background: #1C1C1E; padding: 30px; border-radius: 30px; border: 1px solid var(--primary); }
+        .share-icon-svg { width: 24px; height: 24px; vertical-align: middle; fill: var(--primary); margin: 0 5px; }
 
         .modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1C1C1E; padding: 20px 20px 40px; border-radius: 30px 30px 0 0; z-index: 3000; border-top: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
         input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; background: #2C2C2E; color: white; border: 1px solid var(--border); font-size: 1rem; }
         .city-chip { background: #2C2C2E; border: 1px solid var(--border); color: var(--gray); padding: 10px 15px; border-radius: 12px; font-size: 0.75rem; margin-right: 5px; border: none; }
         .city-chip.active { background: var(--primary); color: white; }
 
-        .fab { position: fixed; bottom: 35px; right: 25px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: none; z-index: 1500; box-shadow: 0 10px 20px rgba(10, 132, 255, 0.4); }
+        .fab { position: fixed; bottom: 35px; right: 25px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: none; z-index: 1500; }
         .hebrew { direction: rtl; text-align: right; }
     </style>
 </head>
 <body onclick="initAudio()">
 
-<div id="alert-status">ОБНОВЛЕНИЕ СТАТУСА...</div>
+<div id="alert-status">ПРОВЕРКА НЕБА...</div>
 
 <div id="pwa-overlay">
     <div class="inst-card">
-        <h2 style="color:var(--primary)">Установка</h2>
-        <p>1. Открой в <b>Safari</b></p>
-        <p>2. Нажми <b>Поделиться</b> (квадрат со стрелкой)</p>
+        <h2 style="color:var(--primary)">Установка на экран</h2>
+        <p>1. Открой сайт в <b>Safari</b></p>
+        <p>2. Нажми кнопку 
+            <svg class="share-icon-svg" viewBox="0 0 50 50"><path d="M30.3 13.7L25 8.4l-5.3 5.3-1.4-1.4L25 5.6l6.7 6.7z"/><path d="M24 7h2v21h-2z"/><path d="M35 40H15c-1.7 0-3-1.3-3-3V19c0-1.7 1.3-3 3-3h7v2h-7c-.6 0-1 .4-1 1v18c0 .6.4 1 1 1h20c.6 0 1-.4 1-1V19c0-.6-.4-1-1-1h-7v-2h7c1.7 0 3 1.3 3 3v18c0 1.7-1.3 3-3 3z"/></svg>
+            (внизу экрана)
+        </p>
         <p>3. Выбери <b>«На экран Домой»</b></p>
-        <button onclick="document.getElementById('pwa-overlay').style.display='none'" style="background:var(--primary); color:white; border:none; padding:15px 30px; border-radius:15px; font-weight:700; margin-top:20px;">ОТКРЫТЬ</button>
+        <button onclick="document.getElementById('pwa-overlay').style.display='none'" style="background:var(--primary); color:white; border:none; padding:15px 30px; border-radius:15px; font-weight:700; margin-top:20px;">ПРОДОЛЖИТЬ</button>
     </div>
 </div>
 
 <header>
-    <a href="https://www.google.com/maps/search/?api=1&query=$" class="sos-btn" target="_blank">🛡️ КАРТА SOS</a>
+    <a href="https://www.google.com/maps/search/public+shelter+ashkelon" class="sos-btn" target="_blank">🛡️ КАРТА SOS</a>
     <div class="logo-text">Expeditor</div>
     <div style="width:60px"></div>
 </header>
@@ -126,29 +100,29 @@
 <button id="fab-plus" class="fab" onclick="clickPlus()">+</button>
 
 <div id="win-order" class="modal">
-    <h3 style="text-align:center; margin-top:0;">Добавить в план</h3>
+    <h3 style="text-align:center; margin-top:0;">Выбрать магазин</h3>
     <div style="display:flex; gap:5px; overflow-x:auto; margin-bottom:15px;" id="order-city-selector"></div>
-    <select id="f-select" size="5" style="height: auto;"></select>
-    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="addTask()">ДОБАВИТЬ</button>
+    <select id="f-select" size="6" style="height: auto;"></select>
+    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="addTask()">ДОБАВИТЬ В ПУТЬ</button>
     <button class="btn-n" style="width:100%; background:none; margin:10px 0; color:var(--gray)" onclick="closeModal()">ЗАКРЫТЬ</button>
 </div>
 
 <div id="win-client" class="modal">
-    <h3 style="text-align:center; margin-top:0;">Клиент</h3>
+    <h3 style="text-align:center; margin-top:0;">Карточка клиента</h3>
     <input type="hidden" id="f-idx" value="-1">
     <select id="f-city"><option>Ашкелон</option><option>Ашдод</option><option>Кирьят-Гат</option><option>Другой</option></select>
-    <input type="text" id="f-name" placeholder="Название">
+    <input type="text" id="f-name" placeholder="Название магазина">
     <input type="tel" id="f-phone" placeholder="Телефон">
     <input type="text" id="f-addr" class="hebrew" placeholder="Адрес (иврит)">
-    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="saveClient()">СОХРАНИТЬ</button>
+    <button class="btn-n b-go" style="width:100%; padding:20px;" onclick="saveClient()">СОХРАНИТЬ В БАЗУ</button>
     <button class="btn-n" style="width:100%; background:none; margin:10px 0; color:var(--gray)" onclick="closeModal()">ОТМЕНА</button>
 </div>
 
 <script>
     let activeTab = 'tasks', filterCity = 'Все', modalCity = 'Ашкелон', audioCtx = null;
-    let clients = JSON.parse(localStorage.getItem('cl_v171')) || [];
-    let tasks = JSON.parse(localStorage.getItem('tk_v171')) || [];
-    let archive = JSON.parse(localStorage.getItem('ar_v171')) || [];
+    let clients = JSON.parse(localStorage.getItem('cl_v172')) || [];
+    let tasks = JSON.parse(localStorage.getItem('tk_v172')) || [];
+    let archive = JSON.parse(localStorage.getItem('ar_v172')) || [];
     const citiesList = ['Ашкелон', 'Ашдод', 'Кирьят-Гат', 'Другой'];
 
     if (!window.navigator.standalone) {
@@ -165,7 +139,6 @@
             if (danger) {
                 status.innerHTML = `🚨 ТРЕВОГА: ${danger.data}!`;
                 status.classList.add('alert-active');
-                if(audioCtx) playSiren();
             } else {
                 status.innerHTML = "● НЕБО ЧИСТОЕ (ONLINE)";
                 status.classList.remove('alert-active');
@@ -175,7 +148,6 @@
     setInterval(checkAlerts, 5000);
 
     function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    function playSiren() { /* Сирена */ }
 
     function setTab(t) { 
         activeTab = t; 
@@ -184,10 +156,10 @@
     }
 
     function moveTask(index, dir) {
-        let newIndex = index + dir;
-        if (newIndex >= 0 && newIndex < tasks.length) {
-            [tasks[index], tasks[newIndex]] = [tasks[newIndex], tasks[index]];
-            localStorage.setItem('tk_v171', JSON.stringify(tasks));
+        let newIdx = index + dir;
+        if (newIdx >= 0 && newIdx < tasks.length) {
+            [tasks[index], tasks[newIdx]] = [tasks[newIdx], tasks[index]];
+            localStorage.setItem('tk_v172', JSON.stringify(tasks));
             render();
         }
     }
@@ -214,7 +186,7 @@
                     <div class="nav-grid">
                         <a href="tel:${t.ph}" class="btn-n b-call">📞 ПОЗВОНИТЬ</a>
                         <a href="waze://?q=${encodeURIComponent(t.a+' '+t.city)}&navigate=yes" class="btn-n b-waze">WAZE</a>
-                        <a href="https://www.google.com/maps/search/${encodeURIComponent(t.a+' '+t.city)}" target="_blank" class="btn-n b-go">GOOGLE</a>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(t.a+' '+t.city)}" target="_blank" class="btn-n b-go">GOOGLE</a>
                         <button class="btn-n b-done" onclick="done(${t.id})">✅ ГОТОВО</button>
                     </div>
                 </div>`).join('');
@@ -224,8 +196,6 @@
                 <button onclick="editClient(${i})" style="background:none; border:none; font-size:1.2rem;">✏️</button></div>`).join('');
         } else if (activeTab === 'archive') {
             cont.innerHTML = archive.slice().reverse().map(a => `<div class="card" style="opacity:0.5;"><b>${a.n}</b><br>${a.a}</div>`).join('');
-        } else if (activeTab === 'help') {
-            cont.innerHTML = `<div class="card"><b>Помощь:</b><br>1. ↑↓ - порядок пути.<br>2. SOS - карта убежищ.<br>3. Готово - в архив.</div>`;
         }
     }
 
@@ -244,7 +214,7 @@
         const n = document.getElementById('f-name').value, a = document.getElementById('f-addr').value, ph = document.getElementById('f-phone').value, city = document.getElementById('f-city').value, idx = parseInt(document.getElementById('f-idx').value);
         if (!n || !a) return;
         if (idx > -1) clients[idx] = {name:n, addr:a, phone:ph, city:city}; else clients.push({name:n, addr:a, phone:ph, city:city});
-        localStorage.setItem('cl_v171', JSON.stringify(clients)); closeModal(); render();
+        localStorage.setItem('cl_v172', JSON.stringify(clients)); closeModal(); render();
     }
 
     function addTask() {
@@ -252,11 +222,11 @@
         if (val==="") return;
         const c = clients[val];
         tasks.push({id: Date.now(), n: c.name, a: c.addr, city: c.city, ph: c.phone});
-        localStorage.setItem('tk_v171', JSON.stringify(tasks)); closeModal(); render();
+        localStorage.setItem('tk_v172', JSON.stringify(tasks)); closeModal(); render();
     }
 
-    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v171', JSON.stringify(tasks)); render(); }
-    function done(id) { let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); localStorage.setItem('tk_v171', JSON.stringify(tasks)); localStorage.setItem('ar_v171', JSON.stringify(archive)); render(); }
+    function delTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('tk_v172', JSON.stringify(tasks)); render(); }
+    function done(id) { let t = tasks.find(x => x.id === id); archive.push(t); tasks = tasks.filter(x => x.id !== id); localStorage.setItem('tk_v172', JSON.stringify(tasks)); localStorage.setItem('ar_v172', JSON.stringify(archive)); render(); }
     function editClient(i) { const c = clients[i]; document.getElementById('f-idx').value = i; document.getElementById('f-name').value = c.name; document.getElementById('f-phone').value = c.phone; document.getElementById('f-addr').value = c.addr; document.getElementById('f-city').value = c.city; document.getElementById('win-client').style.display = 'block'; }
 
     render();
